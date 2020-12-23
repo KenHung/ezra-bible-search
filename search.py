@@ -34,7 +34,7 @@ def similarity(token_a, token_b) -> float:
     asyns = wn.synsets(word_a, pos=pos_a, lang='cmn')
     bsyns = wn.synsets(word_b, pos=pos_b, lang='cmn')
     if asyns and bsyns:
-        sims = map(lambda p: wn.path_similarity(*p),
+        sims = map(lambda p: wn.path_similarity(*p) or 0,
                    itertools.product(asyns, bsyns))
     elif asyns:
         lemmas = (syn.lemma_names(lang='cmn') for syn in asyns)
