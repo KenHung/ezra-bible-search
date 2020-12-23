@@ -4,12 +4,16 @@ import nltk
 from nltk.corpus import wordnet as wn
 
 
-def sentence_similarity(keywords, sentence):
-    keywords = remove_stopwords(keywords)
-    sentence = remove_stopwords(sentence)
-    keywords_similarity = (max(similarity(kw, token)
-                               for token in sentence) for kw in keywords)
-    return sum(keywords_similarity) / len(keywords)
+def sentence_similarity(keywords_tokens, sentence_tokens):
+    keywords_tokens = remove_stopwords(keywords_tokens)
+    sentence_tokens = remove_stopwords(sentence_tokens)
+    kw_score = {}
+    for kw_tk in keywords_tokens:
+        word_score = {word: similarity(kw_tk, (word, pos))
+                      for word, pos in sentence_tokens}
+        match_word = max(word_score, key=word_score.get)
+        kw_score[match_word] = word_score[match_word]
+    return kw_score
 
 
 def remove_stopwords(tokens):

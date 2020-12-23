@@ -12,4 +12,4 @@ def test_search():
     kw_tk = pseg.lcut(kw, use_paddle=True)
     vers_tk = pseg.lcut(vers, use_paddle=True)
     similarity = sentence_similarity(kw_tk, vers_tk)
-    assert similarity >= 0
+    assert similarity is not None
