@@ -17,7 +17,7 @@ def sentence_similarity(keywords_tokens, sentence_tokens):
 
 
 def remove_stopwords(tokens):
-    return [(word, pos) for word, pos in tokens if pos != 'x' and word not in '。，；⋯⋯、']
+    return [(word, pos) for word, pos in tokens if word not in '。，；⋯⋯、 ']
 
 
 def similarity(token_a, token_b) -> float:
