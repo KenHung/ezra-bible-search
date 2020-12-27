@@ -32,7 +32,7 @@ def read_bible(path: str) -> pd.DataFrame:
 
 def read_cbol_dict(path: str) -> pd.DataFrame:
     types = {
-        'strong': np.int32,
+        'strong': 'string',
         'defs': 'string'
     }
     data = pd.read_csv(
@@ -49,11 +49,10 @@ def extract_term(defs: pd.Series) -> pd.Series:
     term = defs\
         .str.extract('n([^n]*?) ?=', expand=False)\
         .str.replace('\(.*\)', '')\
-        .str.replace('[帶冠詞]', 'X')\
-        .str.replace(' 參看 04182 ', ' ')\
-        .str.replace('[或,•‧\-、，="（）族人的]', ' ')
-    term = term.mask(term.notna() & term.str.contains('[a-zA-Z\)]'))
-    return term.str.split()
+        .str.replace('（.*）', '')\
+        .str.replace('[帶冠詞]', '', regex=False)\
+        .str.replace(' 參看 04182 ', ' ')
+    return term.mask(term.str.contains('[a-zA-Z\)\(]'))
 
 
 def in_order(nums: np.ndarray):
