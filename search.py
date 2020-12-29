@@ -1,4 +1,8 @@
 import itertools
+import json
+import os
+from pathlib import Path
+from typing import List
 
 import nltk
 from nltk.corpus import wordnet as wn
@@ -49,6 +53,24 @@ def similarity(token_a, token_b) -> float:
     else:
         sims = [0]
     return max(sims)
+
+
+_conceptnet_terms = {}
+
+
+def load_conceptnet_terms(in_dir: str) -> None:
+    global _conceptnet_terms
+    for word_file in Path(in_dir).iterdir():
+        with open(word_file) as f:
+            ccn_resp = json.load(f)
+            en_labels = extract_en_labels(ccn_resp)
+            if en_labels:
+                _conceptnet_terms[word_file.stem] = en_labels
+
+
+def extract_en_labels(ccn_resp: dict) -> List[str]:
+    edges = ccn_resp.get('edges', [])
+    return [node['end']['label'] for node in edges if node['end'].get('language') == 'en']
 
 
 def map_pos(pos: str) -> str:
