@@ -140,3 +140,5 @@ cython_debug/
 data/
 model/
 *.tgz
+*.h5
+*.bin*
