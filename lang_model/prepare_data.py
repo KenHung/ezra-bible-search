@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 sys.path.append('..')
 
-from data import read_bible
+from build_data import read_bible
 
 
 def save_data(data, out_file):

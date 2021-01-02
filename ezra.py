@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from data import read_bible
+from build_data import read_bible
 
 
 class BibleSearchEngine:
