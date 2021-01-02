@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
@@ -7,7 +8,10 @@ from build_data import read_bible
 
 
 class BibleSearchEngine:
-    def __init__(self, strategy = None, bible_path: str = 'data/dnstrunv.tgz'):
+    def __init__(self, strategy=None, bible_path: str = None):
+        if bible_path is None:
+            file_dir = os.path.dirname(__file__)
+            bible_path = os.path.join(file_dir, 'data/dnstrunv.tgz')
         self.bible = read_bible(bible_path)
         self.strategy = strategy
 
