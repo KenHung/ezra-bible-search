@@ -65,6 +65,6 @@ def in_order(nums: np.ndarray):
 if __name__ == "__main__":
     unv = read_bible('data/dnstrunv.tgz')
     verses_s = unv.text.apply(HanziConv.toSimplified)
-    tokenized = verses_s.apply(
-        lambda v: ' '.join(tokenize(v, remove_punctuation=False)))
-    tokenized.to_csv('data/tokenized_verses.txt', index=False, header=None)
+    tokenized = verses_s.apply(lambda v: ' '.join(tokenize(v)))
+    tokenized.to_csv('word_embeddings/tokenized_verses.txt',
+                     index=False, header=None)
