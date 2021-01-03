@@ -1,8 +1,8 @@
-import jieba
-import jieba.posseg as pseg
 import numpy as np
 import pandas as pd
 from hanziconv import HanziConv
+
+from word_embeddings import tokenize
 
 
 def read_bible(path: str) -> pd.DataFrame:
@@ -58,12 +58,6 @@ def extract_term(defs: pd.Series) -> pd.Series:
     return term.mask(term.str.contains('[a-zA-Z\)\(]'))
 
 
-def tokenize_verses(verse: pd.Series) -> pd.Series:
-    jieba.load_userdict('data/bible_terms.txt')
-    return verse.apply(pseg.lcut)\
-                .apply(lambda l: ' '.join(tk.word for tk in l))
-
-
 def in_order(nums: np.ndarray):
     return np.array_equal(nums, range(1, nums.max() + 1))
 
@@ -71,5 +65,6 @@ def in_order(nums: np.ndarray):
 if __name__ == "__main__":
     unv = read_bible('data/dnstrunv.tgz')
     verses_s = unv.text.apply(HanziConv.toSimplified)
-    tokenized = tokenize_verses(verses_s)
+    tokenized = verses_s.apply(
+        lambda v: ' '.join(tokenize(v, remove_punctuation=False)))
     tokenized.to_csv('data/tokenized_verses.txt', index=False, header=None)
