@@ -7,6 +7,7 @@ from word_embeddings import tokenize
 
 def read_bible(path: str) -> pd.DataFrame:
     types = {
+        'index': np.int32,
         'book': 'string',
         'chap': np.int32,
         'vers': np.int32,
@@ -14,15 +15,15 @@ def read_bible(path: str) -> pd.DataFrame:
     }
     data = pd.read_csv(
         path,
-        compression='gzip',
         sep='#',
         header=None,
-        usecols=[1, 2, 3, 4],
-        names=list(types.keys())
+        index_col=0,
+        usecols=[0, 1, 2, 3, 4],
+        names=list(types.keys()),
+        dtype=types
     )
-    data.dropna(inplace=True)
-    data = data.astype(types)
-    data.sort_values(['book', 'chap', 'vers'], inplace=True)
+    data.sort_values('index', inplace=True)
+    data.reset_index(drop=True, inplace=True)
 
     assert len(data.book.unique()) == 66
     assert data.groupby('book').chap.unique().apply(in_order).all()
@@ -63,7 +64,7 @@ def in_order(nums: np.ndarray):
 
 
 if __name__ == "__main__":
-    unv = read_bible('data/dnstrunv.tgz')
+    unv = read_bible('data/dnstrunv')
     verses_s = unv.text.apply(HanziConv.toSimplified)
     tokenized = verses_s.apply(lambda v: ' '.join(tokenize(v)))
     tokenized.to_csv('word_embeddings/tokenized_verses.txt',
