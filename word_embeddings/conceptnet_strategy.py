@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
-from ezra import BibleSearchStrategy
+from ezra import BibleSearchStrategy, Match
 from sklearn.metrics.pairwise import cosine_similarity
 
 from . import tokenize
@@ -26,7 +26,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
         self._words_no_vec = np.setdiff1d(
             self._all_words, self._words_vec.index)
 
-    def search(self, keyword: str, top_k: int) -> List[Tuple[int, float]]:
+    def search(self, keyword: str, top_k: int) -> List[Match]:
         keyword_tk = np.array(tokenize(keyword))
         kw_vec = self.get_word_vectors(keyword_tk)
         kw_no_vec = np.setdiff1d(keyword_tk, kw_vec.index)
@@ -50,18 +50,14 @@ class ConceptNetStrategy(BibleSearchStrategy):
         similarity = compute_similarity()
 
         verse_matches = []
-        for tokens in self._tokenized_verses:
+        for i, tokens in enumerate(self._tokenized_verses):
             matches = similarity.loc[tokens].idxmax()
-            kw_scores = [(matches[kw], similarity[kw].loc[matches[kw]])
+            kw_scores = [(matches[kw], similarity[kw][matches[kw]])
                          for kw in keyword_tk]
-            verse_matches.append(kw_scores)
+            verse_matches.append(Match(i, kw_scores))
 
-        verse_matches = pd.DataFrame(verse_matches)
-        verse_matches['score'] = verse_matches.apply(
-            lambda x: sum(score for kw, score in x), axis=1)
-        verse_matches.sort_values('score', ascending=False, inplace=True)
-        top_matches = verse_matches[:top_k]
-        return list(zip(top_matches.index, top_matches.score))
+        sorted_matches = sorted(verse_matches, key=Match.score, reverse=True)
+        return sorted_matches[:top_k]
 
     def get_word_vectors(self, words: np.ndarray) -> pd.DataFrame:
         in_vocab = words[np.isin(words, self._embeddings.index)]

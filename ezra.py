@@ -1,14 +1,42 @@
 import os
 from abc import ABC, abstractmethod
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 import pandas as pd
+from hanziconv import HanziConv
 
 from build_data import read_bible
 
 
+class Match:
+    def __init__(self, index: int, kw_scores: List[Tuple[str, float]]):
+        self.index = index
+        self.kw_scores = kw_scores
+        self.verse = ''
+
+    def verse_hightlight(self) -> str:
+        return self._highlight_occurrences(self.verse)
+
+    def score(self) -> float:
+        return sum(sc for _, sc in self.kw_scores)
+
+    def _highlight_occurrences(self, text: str) -> str:
+        for i, kw in enumerate(self.kw_scores):
+            text = text.replace(kw[0], self._highlight(f'{kw[0]}({kw[1]:.2f})', i))
+        return text
+
+    def _highlight(self, text: str, color_code: int) -> str:
+        return f'\x1b[6;30;4{color_code + 1}m{text}\x1b[0m'
+
+
+class BibleSearchStrategy(ABC):
+    @abstractmethod
+    def search(self, keyword: str, top_k: int) -> List[Match]:
+        return NotImplemented
+
+
 class BibleSearchEngine:
-    def __init__(self, strategy=None, bible_path: str = None):
+    def __init__(self, strategy: BibleSearchStrategy = None, bible_path: str = None):
         if bible_path is None:
             file_dir = os.path.dirname(__file__)
             bible_path = os.path.join(file_dir, 'data/dnstrunv')
@@ -16,22 +44,16 @@ class BibleSearchEngine:
         self.strategy = strategy
 
     def search(self, keyword: str, top_k: int = 10,
-               verbose: bool = False) -> List[Tuple[str, float]]:
+               verbose: bool = False) -> List[Match]:
         """
         Search for verses that match the keyword
         """
         results = self.strategy.search(keyword, top_k)
-        verse_results = [(self.bible.text[index], score)
-                         for index, score in results]
+        for match in results:
+            match.verse = HanziConv.toSimplified(self.bible.text[match.index])
         if verbose:
             print(f'Searches for {keyword}:')
-            for verse, score in verse_results:
-                print(f'Score: {score:7.4f} {verse}')
+            for match in results:
+                print(f'Score: {match.score():.2f} {match.verse_hightlight()}')
             print()
-        return verse_results
-
-
-class BibleSearchStrategy(ABC):
-    @abstractmethod
-    def search(self, keyword: str, top_k: int) -> List[Tuple[int, float]]:
-        return NotImplemented
+        return results
