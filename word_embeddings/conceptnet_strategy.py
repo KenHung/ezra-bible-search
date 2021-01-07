@@ -51,9 +51,8 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
         verse_matches = []
         for i, tokens in enumerate(self._tokenized_verses):
-            matches = similarity.loc[tokens].idxmax()
-            kw_scores = [(matches[kw], similarity[kw][matches[kw]])
-                         for kw in keyword_tk]
+            scores = similarity.loc[tokens]
+            kw_scores = list(zip(scores.idxmax(), scores.max()))
             verse_matches.append(Match(i, kw_scores))
 
         sorted_matches = sorted(verse_matches, key=Match.score, reverse=True)
