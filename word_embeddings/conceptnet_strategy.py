@@ -23,52 +23,59 @@ class ConceptNetStrategy(BibleSearchStrategy):
         tokenized_verses = [verse.split() for verse in verse_lines]
         all_words = np.unique(
             [word for verse in tokenized_verses for word in verse])
-        self._words_vec = self.get_word_vectors(all_words)
-        self._words_no_vec = np.setdiff1d(all_words, self._words_vec.index)
+        self._words_vec, self._words_no_vec = self._get_word_vectors(all_words)
 
         def to_num_tk(word: str) -> int:
             try:
                 return self._words_vec.index.get_loc(word)
             except KeyError:
-                return np.where(self._words_no_vec == word)[0][0] + len(self._words_vec)
+                no_vec_index = np.where(self._words_no_vec == word)[0][0]
+                return no_vec_index + len(self._words_vec)
         self._num_tk_verses = [np.unique(list(map(to_num_tk, verse)))
                                for verse in tokenized_verses]
 
     def search(self, keyword: str, top_k: int) -> List[Match]:
         keyword_tk = np.array(tokenize(keyword))
-        kw_vec = self.get_word_vectors(keyword_tk)
-        kw_no_vec = np.setdiff1d(keyword_tk, kw_vec.index)
+        kw_vec, kw_no_vec = self._get_word_vectors(keyword_tk)
 
         def compute_similarity() -> pd.DataFrame:
-            similarity_cs = cosine_similarity(kw_vec, self._words_vec)
-            similarity_kw_no_vec = pd.DataFrame.from_dict(
-                {kw: np.where(self._words_vec.index == kw, 1, 0)
-                 for kw in kw_no_vec}
-            )  # .set_index(self._words_vec.index)
-            similarity_no_vec = np.stack([np.where(self._words_no_vec == kw, 1, 0)
-                                          for kw in keyword_tk])
-            # similarity_all_kw = pd.concat(
-            #    [similarity_cs, similarity_kw_no_vec], axis=1)
-            return np.hstack((similarity_cs, similarity_no_vec))
+            in_vocab = cosine_similarity(kw_vec, self._words_vec)
+            if len(kw_no_vec) > 0:
+                kw_oov = self._similarity_oov(kw_no_vec, self._words_vec.index)
+                all_kw = np.stack((in_vocab,  kw_oov))
+            else:
+                all_kw = in_vocab
+            verse_oov = self._similarity_oov(keyword_tk, self._words_no_vec)
+            return np.hstack((all_kw, verse_oov))
         similarity = compute_similarity()
 
-        verse_matches = []
-        for i, tokens in enumerate(self._num_tk_verses):
-            kw_scores = []
-            for kw in range(len(keyword_tk)):
-                scores = similarity[kw][tokens]
-                max_word = np.argmax(scores)
-                kw_scores.append((tokens[max_word], scores[max_word]))
-            verse_matches.append(Match(i, kw_scores))
+        def find_match(kw, tokens):
+            scores = similarity[kw][tokens]
+            match_word = np.argmax(scores)
+            return tokens[match_word], scores[match_word]
 
-        top_matches = sorted(
-            verse_matches, key=Match.score, reverse=True)[:top_k]
+        def verse_match(index_tokens):
+            index, tokens = index_tokens
+            kw_scores = [find_match(kw, tokens)
+                         for kw in range(len(keyword_tk))]
+            return Match(index, kw_scores)
+        verse_matches = map(verse_match, enumerate(self._num_tk_verses))
+
+        top_matches = sorted(verse_matches,
+                             key=Match.score, reverse=True)[:top_k]
         for m in top_matches:
             m.kw_scores = [(self._words_vec.index[kw], score)
                            for kw, score in m.kw_scores]
         return top_matches
 
-    def get_word_vectors(self, words: np.ndarray) -> pd.DataFrame:
-        in_vocab = words[np.isin(words, self._embeddings.index)]
+    def _similarity_oov(self, xs: np.array, ys: np.array) -> np.ndarray:
+        return np.stack([np.where(ys == x, 1, 0) for x in xs])
+
+    def _get_word_vectors(self, words: np.ndarray) -> Tuple[pd.DataFrame, np.array]:
+        in_vocab = [word for word in words if self._in_vocab(word)]
+        out_of_vocab = np.setdiff1d(words, in_vocab)
+        return self._embeddings.loc[in_vocab], out_of_vocab
+
+    def _in_vocab(self, word: str) -> bool:
         # TODO: OOV
-        return self._embeddings.loc[in_vocab]
+        return word in self._embeddings.index
