@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from hanziconv import HanziConv
 
-from word_embeddings import tokenize
+from word_embeddings import word_tokenize
 
 
 def read_bible(path: str) -> pd.DataFrame:
@@ -66,6 +66,6 @@ def in_order(nums: np.ndarray):
 if __name__ == "__main__":
     unv = read_bible('data/dnstrunv')
     verses_s = unv.text.apply(HanziConv.toSimplified)
-    tokenized = verses_s.apply(lambda v: ' '.join(tokenize(v)))
-    tokenized.to_csv('word_embeddings/tokenized_verses.txt',
+    tokenized = verses_s.apply(lambda v: ' '.join(word_tokenize(v)))
+    tokenized.to_csv('word_embeddings/word_tokenized_verses.txt',
                      index=False, header=None)

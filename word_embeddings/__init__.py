@@ -7,7 +7,7 @@ import jieba.posseg as pseg
 _bible_terms_loaded: bool = False
 
 
-def tokenize(verse: str, remove_punctuation: bool = True) -> List[str]:
+def word_tokenize(verse: str, remove_punctuation: bool = True) -> List[str]:
     global _bible_terms_loaded
     if not _bible_terms_loaded:
         bible_terms = resources.open_text(__name__, 'bible_terms.txt')

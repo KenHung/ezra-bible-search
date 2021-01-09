@@ -35,7 +35,7 @@ def run(argv=None, save_main_session=True):
         '--job_name=phases-got-cut-job',
     ])
 
-    with open('tokenized_verses.txt') as f:
+    with open('word_tokenized_verses.txt') as f:
         lines = f.readlines()[:10]
 
     pipeline_options = PipelineOptions(pipeline_args)

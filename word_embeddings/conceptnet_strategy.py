@@ -8,7 +8,7 @@ import pandas as pd
 from ezra import BibleSearchStrategy, Match
 from sklearn.metrics.pairwise import cosine_similarity
 
-from . import tokenize
+from . import word_tokenize
 
 
 class ConceptNetStrategy(BibleSearchStrategy):
@@ -18,39 +18,21 @@ class ConceptNetStrategy(BibleSearchStrategy):
         self._embeddings.index = self._embeddings.index.str.replace(
             '/c/zh/', '')
 
-        verse_lines = resources.read_text(__package__, 'tokenized_verses.txt')\
+        verse_lines = resources.read_text(__package__, 'word_tokenized_verses.txt')\
                                .split('\n')[:-1]
-        tokenized_verses = [verse.split() for verse in verse_lines]
+        word_tokenized_verses = [verse.split() for verse in verse_lines]
         all_words = np.unique(
-            [word for verse in tokenized_verses for word in verse])
+            [word for verse in word_tokenized_verses for word in verse])
         self._words_vec, self._words_no_vec = self._get_word_vectors(all_words)
 
-        num_tk_verses = [np.unique(list(map(self._num_tokenize, verse)))
-                         for verse in tokenized_verses]
-        max_length = max(map(len, num_tk_verses))
-        self._num_tk_verses = np.stack([np.append(v, np.zeros(max_length - v.size, int))
-                                        for v in num_tk_verses])
-
-    _reserved_token_length = 1
-
-    def _num_tokenize(self, word: str) -> int:
-        try:
-            index_by_vocab = self._words_vec.index.get_loc(word)
-        except KeyError:
-            no_vec_index = np.where(self._words_no_vec == word)[0][0]
-            index_by_vocab = no_vec_index + len(self._words_vec)
-        return ConceptNetStrategy._reserved_token_length + index_by_vocab
-
-    def _num_detokenize(self, token: int) -> str:
-        index = token - ConceptNetStrategy._reserved_token_length
-        try:
-            return self._words_vec.index[index]
-        except KeyError:
-            index -= len(self._words_vec)
-            return self._words_no_vec[index]
+        tokenized_verses = [np.unique(list(map(self._tokenize, verse)))
+                            for verse in word_tokenized_verses]
+        max_length = max(map(len, tokenized_verses))
+        self._tokenized_verses = np.stack([np.append(v, np.zeros(max_length - v.size, int))
+                                           for v in tokenized_verses])
 
     def search(self, keyword: str, top_k: int) -> List[Match]:
-        keyword_tk = np.array(tokenize(keyword))
+        keyword_tk = np.array(word_tokenize(keyword))
         kw_vec, kw_no_vec = self._get_word_vectors(keyword_tk)
 
         def compute_similarity() -> pd.DataFrame:
@@ -65,22 +47,22 @@ class ConceptNetStrategy(BibleSearchStrategy):
             return np.hstack((reserved_tokens, all_kw, verse_oov))
         similarity = compute_similarity()
 
-        all_match_scores = similarity[:, self._num_tk_verses]
+        all_match_scores = similarity[:, self._tokenized_verses]
         kw_verse_scores = np.amax(all_match_scores, axis=2)
         verse_scores = kw_verse_scores.sum(axis=0)
         top_matches = np.argsort(verse_scores)[-1:-top_k-1:-1]
 
-        def find_match(kw, tokens):
-            scores = similarity[kw, tokens]
-            match_word = np.argmax(scores)
-            return self._num_detokenize(tokens[match_word]), scores[match_word]
-        top_matches_info = []
-        for index in top_matches:
-            tokens = self._num_tk_verses[index]
-            kw_scores = [find_match(kw, tokens)
-                         for kw in range(len(keyword_tk))]
-            top_matches_info.append(Match(index, kw_scores))
-        return top_matches_info
+        def create_match(index: int) -> Match:
+            tokens = self._tokenized_verses[index]
+            kw_scores = []
+            for kw in range(len(keyword_tk)):
+                scores = similarity[kw, tokens]
+                match_word = np.argmax(scores)
+                match_token = tokens[match_word]
+                kw_scores.append((self._detokenize(match_token),
+                                  scores[match_word]))
+            return Match(index, kw_scores)
+        return [create_match(i) for i in top_matches]
 
     def _similarity_oov(self, xs: np.array, ys: np.array) -> np.ndarray:
         return np.stack([np.where(ys == x, 1, 0) for x in xs])
@@ -93,3 +75,21 @@ class ConceptNetStrategy(BibleSearchStrategy):
     def _in_vocab(self, word: str) -> bool:
         # TODO: OOV
         return word in self._embeddings.index
+
+    _reserved_token_length = 1
+
+    def _tokenize(self, word: str) -> int:
+        try:
+            index_by_vocab = self._words_vec.index.get_loc(word)
+        except KeyError:
+            no_vec_index = np.where(self._words_no_vec == word)[0][0]
+            index_by_vocab = no_vec_index + len(self._words_vec)
+        return ConceptNetStrategy._reserved_token_length + index_by_vocab
+
+    def _detokenize(self, token: int) -> str:
+        index = token - ConceptNetStrategy._reserved_token_length
+        try:
+            return self._words_vec.index[index]
+        except KeyError:
+            index -= len(self._words_vec)
+            return self._words_no_vec[index]
