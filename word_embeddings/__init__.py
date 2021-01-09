@@ -4,15 +4,16 @@ from typing import List
 import jieba
 import jieba.posseg as pseg
 
-_bible_terms_loaded: bool = False
+_bible_tokens_loaded: bool = False
 
 
 def word_tokenize(verse: str, remove_punctuation: bool = True) -> List[str]:
-    global _bible_terms_loaded
-    if not _bible_terms_loaded:
-        bible_terms = resources.open_text(__name__, 'bible_terms.txt')
-        jieba.load_userdict(bible_terms)
-        _bible_terms_loaded = True
+    global _bible_tokens_loaded
+    if not _bible_tokens_loaded:
+        for token_file in ['classics.txt', 'names.txt']:
+            tokens = resources.open_text(f'{__name__}.word_tokens', token_file)
+            jieba.load_userdict(tokens)
+        _bible_tokens_loaded = True
 
     if remove_punctuation:
         def filter_cond(tk): return tk.flag != 'x'
