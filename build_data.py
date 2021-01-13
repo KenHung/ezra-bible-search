@@ -112,10 +112,12 @@ def extract_vocabs(cbol_def_lines: pd.Series, pattern: str = r'(.*?)=(.*)') -> p
 
 
 def clean_vocab_names(names: pd.Series) -> pd.Series:
-    return names.replace(r'\(.*\)', '', regex=True)\
-                .replace(r'（.*）', '', regex=True)\
-                .replace(r'\[.*\]', '', regex=True)\
-                .str.replace('參看 04182 摩利設迦特', '')
+    return names.str.replace(r'\(.*\)', '')\
+                .str.replace(r'（.*）', '')\
+                .str.replace(r'\[.*\]', '')\
+                .str.replace('參看 04182 摩利設迦特', '')\
+                .str.replace(r'[ "]', '')\
+                .str.replace(r'[•‧．・\-]', '・')
 
 
 def find_name_over_def(lines):
@@ -131,7 +133,9 @@ def in_order(nums: np.ndarray):
 
 if __name__ == "__main__":
     unv = read_bible('data/dnstrunv')
-    verses_s = unv.text.apply(HanziConv.toSimplified)
+    dots = r'[•‧．・\-]'
+    verses_s = unv.text.apply(HanziConv.toSimplified)\
+                       .str.replace(dots, '')
     tokenized = verses_s.apply(lambda v: ' '.join(word_tokenize(v)))
     tokenized.to_csv('word_embeddings/word_tokenized_verses.txt',
                      index=False, header=None)
