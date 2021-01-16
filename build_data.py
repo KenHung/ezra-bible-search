@@ -97,11 +97,11 @@ def create_name_dict(cbol_dict: pd.DataFrame) -> pd.DataFrame:
                                       f'({"|".join(left_over_names)})').drop_duplicates()
 
     all_vocabs = pd.concat([vocabs_eq, vocabs_over_def, left_over_vocabs])
-    vocabs = all_vocabs.merge(cbol_dict[['pos', 'jieba_pos']],
+    vocabs = all_vocabs.merge(cbol_dict[['strong', 'pos', 'jieba_pos']],
                               left_index=True, right_index=True)
     vocabs['name'] = clean_vocab_names(vocabs[0])
     invalid = vocabs.name.str.contains(r'[\(\)a-z]')
-    return vocabs[~invalid][['name', 1, 'pos', 'jieba_pos']]
+    return vocabs[~invalid][['strong', 'name', 1, 'pos', 'jieba_pos']]
 
 
 def extract_vocabs(cbol_def_lines: pd.Series, pattern: str = r'(.*?)=(.*)') -> pd.DataFrame:
