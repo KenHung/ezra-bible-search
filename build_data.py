@@ -3,7 +3,6 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-from opencc import OpenCC
 
 from word_embeddings import word_tokenize
 
@@ -134,9 +133,7 @@ def in_order(nums: np.ndarray):
 if __name__ == "__main__":
     unv = read_bible('data/dnstrunv')
     dots = r'[•‧．・\-]'
-    t2s = OpenCC('t2s.json')
-    verses_s = unv.text.apply(t2s.convert)\
-                       .str.replace(dots, '')
-    tokenized = verses_s.apply(lambda v: ' '.join(word_tokenize(v)))
+    verses = unv.text.str.replace(dots, '')
+    tokenized = verses.apply(lambda v: ' '.join(word_tokenize(v)))
     tokenized.to_csv('word_embeddings/word_tokenized_verses.txt',
                      index=False, header=None)
