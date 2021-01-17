@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 from ezra import BibleSearchStrategy, Match
+from opencc import OpenCC
 from sklearn.metrics.pairwise import cosine_similarity
 
 from . import word_tokenize
@@ -17,6 +18,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
             self._embeddings: pd.DataFrame = pd.read_hdf(hdf_file)
         self._embeddings.index = self._embeddings.index.str.replace(
             '/c/zh/', '')
+        self._t2s = OpenCC('t2s.json')
 
         verse_lines = resources.read_text(__package__, 'word_tokenized_verses.txt')\
                                .split('\n')[:-1]
@@ -32,7 +34,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
                                            for v in tokenized_verses])
 
     def search(self, keyword: str, top_k: int) -> List[Match]:
-        keyword_tk = np.array(word_tokenize(keyword))
+        keyword_tk = np.array(list(word_tokenize(keyword)))
         kw_vec, kw_no_vec = self._get_word_vectors(keyword_tk)
 
         def compute_similarity() -> pd.DataFrame:
@@ -67,10 +69,12 @@ class ConceptNetStrategy(BibleSearchStrategy):
     def _similarity_oov(self, xs: np.array, ys: np.array) -> np.ndarray:
         return np.stack([np.where(ys == x, 1, 0) for x in xs])
 
-    def _get_word_vectors(self, words: np.ndarray) -> Tuple[pd.DataFrame, np.array]:
-        in_vocab = [word for word in words if self._in_vocab(word)]
+    def _get_word_vectors(self, words: np.array) -> Tuple[pd.DataFrame, np.array]:
+        in_vocab = [word for word in words if self._in_vocab(self._t2s.convert(word))]
         out_of_vocab = np.setdiff1d(words, in_vocab)
-        return self._embeddings.loc[in_vocab], out_of_vocab
+        word_vec = self._embeddings.loc[map(self._t2s.convert, in_vocab)]
+        word_vec.index = in_vocab
+        return word_vec, out_of_vocab
 
     def _in_vocab(self, word: str) -> bool:
         # TODO: OOV

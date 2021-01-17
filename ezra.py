@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable, List, Tuple
 
 import pandas as pd
-from hanziconv import HanziConv
+from opencc import OpenCC
 
 from build_data import read_bible
 
@@ -22,7 +22,8 @@ class Match:
 
     def _highlight_occurrences(self, text: str) -> str:
         for i, kw in enumerate(self.kw_scores):
-            text = text.replace(kw[0], self._highlight(f'{kw[0]}({kw[1]:.2f})', i))
+            text = text.replace(kw[0],
+                                self._highlight(f'{kw[0]}({kw[1]:.2f})', i))
         return text
 
     def _highlight(self, text: str, color_code: int) -> str:
@@ -36,21 +37,32 @@ class BibleSearchStrategy(ABC):
 
 
 class BibleSearchEngine:
-    def __init__(self, strategy: BibleSearchStrategy = None, bible_path: str = None):
+    def __init__(self, strategy: BibleSearchStrategy, bible_path: str = None):
         if bible_path is None:
             file_dir = os.path.dirname(__file__)
             bible_path = os.path.join(file_dir, 'data/dnstrunv')
         self.bible = read_bible(bible_path)
         self.strategy = strategy
+        self._t2s = OpenCC('t2s.json')
 
-    def search(self, keyword: str, top_k: int = 10,
+    def search(self, keyword: str, zh_cn: bool, top_k: int = 10,
                verbose: bool = False) -> List[Match]:
         """
         Search for verses that match the keyword
         """
+        if not zh_cn:
+            keyword = self._t2s.convert(keyword)
         results = self.strategy.search(keyword, top_k)
+
         for match in results:
-            match.verse = HanziConv.toSimplified(self.bible.text[match.index])
+            bible_text = self.bible.text[match.index]
+            if zh_cn:
+                match.verse = self._t2s.convert(bible_text)
+                match.kw_scores = [(self._t2s.convert(kw), score)
+                                   for kw, score in match.kw_scores]
+            else:
+                match.verse = bible_text
+
         if verbose:
             print(f'Searches for {keyword}:')
             for match in results:
