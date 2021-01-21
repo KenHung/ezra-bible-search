@@ -13,15 +13,16 @@
 .git
 .gitignore
 #!include:.gitignore
+!ezra/resources/*
 
 # Python pycache:
 __pycache__/
 # Ignored by the build system
 /setup.cfg
 
-.vscode
-notebooks
+.vscode/
+.DS_Store
+notebooks/
 sentence_embeddings
-tests
+tests/
 *.ipynb
-word_embeddings
