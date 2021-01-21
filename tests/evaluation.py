@@ -5,7 +5,7 @@ from itertools import combinations
 from ezra import BibleSearchEngine
 from hanziconv import HanziConv
 from tqdm import tqdm
-from word_embeddings.conceptnet_strategy import ConceptNetStrategy
+from ezra.conceptnet_strategy import ConceptNetStrategy
 
 strategy = ConceptNetStrategy()
 

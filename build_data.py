@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from word_embeddings import word_tokenize
+from ezra import word_tokenize
 from ezra.resources import bible
 
 
@@ -102,5 +102,5 @@ if __name__ == "__main__":
     dots = r'[•‧．・\-]'
     verses = bible.text.str.replace(dots, '')
     tokenized = verses.apply(lambda v: ' '.join(word_tokenize(v)))
-    tokenized.to_csv('word_embeddings/word_tokenized_verses.txt',
+    tokenized.to_csv('ezra/resources/word_tokenized_verses.txt',
                      index=False, header=None)

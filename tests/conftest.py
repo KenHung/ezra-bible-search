@@ -1,6 +1,6 @@
 from ezra import BibleSearchEngine
 from pytest import fixture
-from word_embeddings.conceptnet_strategy import ConceptNetStrategy
+from ezra.conceptnet_strategy import ConceptNetStrategy
 
 
 @fixture()

@@ -1,4 +1,4 @@
-from word_embeddings import word_tokenize
+from ezra import word_tokenize
 
 
 def test_word_tokenize():

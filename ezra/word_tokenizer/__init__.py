@@ -13,7 +13,7 @@ def word_tokenize(sentence: str) -> Iterable[str]:
     global _bible_tokens_loaded
     if not _bible_tokens_loaded:
         for token_file in ['classics.txt', 'names.txt']:
-            tokens = resources.open_text(f'{__name__}.word_tokens', token_file)
+            tokens = resources.open_text(__package__, token_file)
             jieba.load_userdict(tokens)
         _bible_tokens_loaded = True
 

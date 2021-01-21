@@ -141,7 +141,5 @@ cython_debug/
 !*/resources/__init__.py
 
 data/
-*model/
+models/
 *.ans
-*.h5
-*.bin*

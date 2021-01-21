@@ -14,13 +14,13 @@ from . import word_tokenize
 
 class ConceptNetStrategy(BibleSearchStrategy):
     def __init__(self):
-        with resources.path(__package__, 'mini.zh.h5') as hdf_file:
+        with resources.path('ezra.resources', 'conceptnet.zh.h5') as hdf_file:
             self._embeddings: pd.DataFrame = pd.read_hdf(hdf_file)
         self._embeddings.index = self._embeddings.index.str.replace(
             '/c/zh/', '')
         self._t2s = OpenCC('t2s.json')
 
-        verse_lines = resources.read_text(__package__, 'word_tokenized_verses.txt')\
+        verse_lines = resources.read_text('ezra.resources', 'word_tokenized_verses.txt')\
                                .split('\n')[:-1]
         word_tokenized_verses = [verse.split() for verse in verse_lines]
         all_words = np.unique(
