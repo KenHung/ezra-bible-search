@@ -1,5 +1,0 @@
-datasets >= 1.1.3
-sentencepiece != 0.1.92
-protobuf
-# install from source for running the script
--e git+https://github.com/huggingface/transformers.git@v4.1.1#egg=transformers
