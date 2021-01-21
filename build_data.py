@@ -5,35 +5,7 @@ import numpy as np
 import pandas as pd
 
 from word_embeddings import word_tokenize
-
-
-def read_bible(path: str) -> pd.DataFrame:
-    types = {
-        'index': np.int32,
-        'book': 'string',
-        'chap': np.int32,
-        'vers': np.int32,
-        'text': 'string'
-    }
-    data = pd.read_csv(
-        path,
-        sep='#',
-        header=None,
-        index_col=0,
-        usecols=[0, 1, 2, 3, 4],
-        names=list(types.keys()),
-        dtype=types
-    )
-    data.sort_values('index', inplace=True)
-    data.reset_index(drop=True, inplace=True)
-
-    assert len(data.book.unique()) == 66
-    assert data.groupby('book').chap.unique().apply(in_order).all()
-    vers_by_book_chap = data.groupby(['book', 'chap']).vers
-    assert vers_by_book_chap.apply(in_order).all()
-    assert vers_by_book_chap.max().sum() == len(data) == 31103
-
-    return data
+from ezra.resources import bible
 
 
 def read_cbol_dict(path: str) -> pd.DataFrame:
@@ -126,14 +98,9 @@ def find_name_over_def(lines):
     return term if term and '詞' not in term else np.nan
 
 
-def in_order(nums: np.ndarray):
-    return np.array_equal(nums, range(1, nums.max() + 1))
-
-
 if __name__ == "__main__":
-    unv = read_bible('data/dnstrunv')
     dots = r'[•‧．・\-]'
-    verses = unv.text.str.replace(dots, '')
+    verses = bible.text.str.replace(dots, '')
     tokenized = verses.apply(lambda v: ' '.join(word_tokenize(v)))
     tokenized.to_csv('word_embeddings/word_tokenized_verses.txt',
                      index=False, header=None)

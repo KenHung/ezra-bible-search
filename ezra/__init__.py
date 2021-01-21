@@ -5,7 +5,7 @@ from typing import Iterable, List, Tuple
 import pandas as pd
 from opencc import OpenCC
 
-from build_data import read_bible
+from .resources import bible
 
 
 class Match:
@@ -41,7 +41,6 @@ class BibleSearchEngine:
         if bible_path is None:
             file_dir = os.path.dirname(__file__)
             bible_path = os.path.join(file_dir, 'data/dnstrunv')
-        self.bible = read_bible(bible_path)
         self.strategy = strategy
         self._t2s = OpenCC('t2s.json')
 
@@ -55,7 +54,7 @@ class BibleSearchEngine:
         results = self.strategy.search(keyword, top_k)
 
         for match in results:
-            bible_text = self.bible.text[match.index]
+            bible_text = bible.text[match.index]
             if zh_cn:
                 match.verse = self._t2s.convert(bible_text)
                 match.kw_scores = [(self._t2s.convert(kw), score)
