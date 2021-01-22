@@ -5,5 +5,5 @@ from ezra.conceptnet_strategy import ConceptNetStrategy
 
 @fixture()
 def ezra_engine():
-    strategy = ConceptNetStrategy()
+    strategy = ConceptNetStrategy.from_pickle()
     return BibleSearchEngine(strategy)

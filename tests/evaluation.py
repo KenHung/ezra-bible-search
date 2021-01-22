@@ -7,7 +7,7 @@ from hanziconv import HanziConv
 from tqdm import tqdm
 from ezra.conceptnet_strategy import ConceptNetStrategy
 
-strategy = ConceptNetStrategy()
+strategy = ConceptNetStrategy.from_pickle()
 
 ezra_engine = BibleSearchEngine(strategy)
 keywords = open('word_tokens.txt').read().splitlines()

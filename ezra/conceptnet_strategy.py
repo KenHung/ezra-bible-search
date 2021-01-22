@@ -1,14 +1,17 @@
 import itertools
 import json
+import pickle
 from importlib import resources
 from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
-from ezra import BibleSearchStrategy, Match
 from sklearn.metrics.pairwise import cosine_similarity
 
-from . import word_tokenize, to_simplified
+from ezra import BibleSearchStrategy, Match
+
+from . import to_simplified, word_tokenize
+from .resources import bible
 
 
 class ConceptNetStrategy(BibleSearchStrategy):
@@ -18,18 +21,24 @@ class ConceptNetStrategy(BibleSearchStrategy):
         self._embeddings.index = self._embeddings.index.str.replace(
             '/c/zh/', '')
 
-        verse_lines = resources.read_text('ezra.resources', 'word_tokenized_verses.txt')\
-                               .split('\n')[:-1]
-        word_tokenized_verses = [verse.split() for verse in verse_lines]
+        dots = r'[•‧．・\-]'
+        verses = bible.text.str.replace(dots, '', regex=True)
+        word_tokenized_verses = verses.transform(
+            lambda v: list(word_tokenize(v)))
         all_words = np.unique(
             [word for verse in word_tokenized_verses for word in verse])
         self._words_vec, self._words_no_vec = self._get_word_vectors(all_words)
 
-        tokenized_verses = [np.unique(list(map(self._tokenize, verse)))
+        tokenized_verses = [list(set(map(self._tokenize, verse)))
                             for verse in word_tokenized_verses]
         max_length = max(map(len, tokenized_verses))
-        self._tokenized_verses = np.stack([np.append(v, np.zeros(max_length - v.size, int))
+        self._tokenized_verses = np.array([v + [0]*(max_length-len(v))
                                            for v in tokenized_verses])
+
+    @classmethod
+    def from_pickle(cls):
+        with resources.open_binary('ezra.resources', 'conceptnet_strategy.pickle') as f:
+            return pickle.load(f)
 
     def search(self, keyword: str, top_k: int) -> List[Match]:
         keyword_tk = np.array(list(word_tokenize(keyword)))
@@ -68,7 +77,8 @@ class ConceptNetStrategy(BibleSearchStrategy):
         return np.stack([np.where(ys == x, 1, 0) for x in xs])
 
     def _get_word_vectors(self, words: np.array) -> Tuple[pd.DataFrame, np.array]:
-        in_vocab = [word for word in words if self._in_vocab(to_simplified(word))]
+        in_vocab = [word for word in words
+                    if self._in_vocab(to_simplified(word))]
         out_of_vocab = np.setdiff1d(words, in_vocab)
         word_vec = self._embeddings.loc[map(to_simplified, in_vocab)]
         word_vec.index = in_vocab

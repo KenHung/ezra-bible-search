@@ -4,9 +4,6 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from ezra import word_tokenize
-from ezra.resources import bible
-
 
 def read_cbol_dict(path: str) -> pd.DataFrame:
     types = {
@@ -96,11 +93,3 @@ def find_name_over_def(lines):
                       if line.startswith('1)')), None)
     term = lines[first_def - 1] if first_def else np.nan
     return term if term and '詞' not in term else np.nan
-
-
-if __name__ == "__main__":
-    dots = r'[•‧．・\-]'
-    verses = bible.text.str.replace(dots, '')
-    tokenized = verses.apply(lambda v: ' '.join(word_tokenize(v)))
-    tokenized.to_csv('ezra/resources/word_tokenized_verses.txt',
-                     index=False, header=None)

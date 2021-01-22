@@ -13,7 +13,8 @@
 .git
 .gitignore
 #!include:.gitignore
-!ezra/resources/*
+!ezra/resources/*.pickle
+!ezra/resources/*.dsv
 
 # Python pycache:
 __pycache__/
