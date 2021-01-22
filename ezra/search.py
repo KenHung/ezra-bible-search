@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from typing import Iterable, List, Tuple
 
 import pandas as pd
-from opencc import OpenCC
 
+from .lang import to_simplified
 from .resources import bible
 
 
@@ -42,7 +42,6 @@ class BibleSearchEngine:
             file_dir = os.path.dirname(__file__)
             bible_path = os.path.join(file_dir, 'data/dnstrunv')
         self.strategy = strategy
-        self._t2s = OpenCC('t2s.json')
 
     def search(self, keyword: str, zh_cn: bool, top_k: int = 10,
                verbose: bool = False) -> List[Match]:
@@ -50,14 +49,14 @@ class BibleSearchEngine:
         Search for verses that match the keyword
         """
         if not zh_cn:
-            keyword = self._t2s.convert(keyword)
+            keyword = to_simplified(keyword)
         results = self.strategy.search(keyword, top_k)
 
         for match in results:
             bible_text = bible.text[match.index]
             if zh_cn:
-                match.verse = self._t2s.convert(bible_text)
-                match.kw_scores = [(self._t2s.convert(kw), score)
+                match.verse = to_simplified(bible_text)
+                match.kw_scores = [(to_simplified(kw), score)
                                    for kw, score in match.kw_scores]
             else:
                 match.verse = bible_text

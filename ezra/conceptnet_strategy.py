@@ -6,10 +6,9 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 from ezra import BibleSearchStrategy, Match
-from opencc import OpenCC
 from sklearn.metrics.pairwise import cosine_similarity
 
-from . import word_tokenize
+from . import word_tokenize, to_simplified
 
 
 class ConceptNetStrategy(BibleSearchStrategy):
@@ -18,7 +17,6 @@ class ConceptNetStrategy(BibleSearchStrategy):
             self._embeddings: pd.DataFrame = pd.read_hdf(hdf_file)
         self._embeddings.index = self._embeddings.index.str.replace(
             '/c/zh/', '')
-        self._t2s = OpenCC('t2s.json')
 
         verse_lines = resources.read_text('ezra.resources', 'word_tokenized_verses.txt')\
                                .split('\n')[:-1]
@@ -70,9 +68,9 @@ class ConceptNetStrategy(BibleSearchStrategy):
         return np.stack([np.where(ys == x, 1, 0) for x in xs])
 
     def _get_word_vectors(self, words: np.array) -> Tuple[pd.DataFrame, np.array]:
-        in_vocab = [word for word in words if self._in_vocab(self._t2s.convert(word))]
+        in_vocab = [word for word in words if self._in_vocab(to_simplified(word))]
         out_of_vocab = np.setdiff1d(words, in_vocab)
-        word_vec = self._embeddings.loc[map(self._t2s.convert, in_vocab)]
+        word_vec = self._embeddings.loc[map(to_simplified, in_vocab)]
         word_vec.index = in_vocab
         return word_vec, out_of_vocab
 

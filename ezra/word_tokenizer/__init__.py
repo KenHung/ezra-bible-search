@@ -3,10 +3,10 @@ from typing import Iterable
 
 import jieba
 import jieba.posseg as pseg
-from opencc import OpenCC
+
+from ..lang import to_simplified
 
 _bible_tokens_loaded: bool = False
-_t2s = OpenCC('t2s.json')
 
 
 def word_tokenize(sentence: str) -> Iterable[str]:
@@ -17,7 +17,7 @@ def word_tokenize(sentence: str) -> Iterable[str]:
             jieba.load_userdict(tokens)
         _bible_tokens_loaded = True
 
-    sentence_s = _t2s.convert(sentence)
+    sentence_s = to_simplified(sentence)
     assert len(sentence) == len(sentence_s)
     total = 0
     for tk in pseg.cut(sentence_s):
