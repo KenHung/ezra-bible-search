@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
-from ezra import BibleSearchStrategy, Match
-
-from . import to_simplified, word_tokenize
+from .lang import to_simplified
 from .resources import bible
+from .search import BibleSearchStrategy, Match
+from .word_tokenizer import word_tokenize
 
 
 class ConceptNetStrategy(BibleSearchStrategy):

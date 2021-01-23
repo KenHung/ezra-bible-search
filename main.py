@@ -1,8 +1,10 @@
-from flask import Flask
+"""create app and config logging for GCP App Engine."""
+import google.cloud.logging
 
-app = Flask(__name__)
+from ezra import create_app
 
+client = google.cloud.logging.Client()
+client.get_default_handler()
+client.setup_logging()
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+app = create_app()
