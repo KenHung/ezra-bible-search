@@ -3,7 +3,6 @@ from importlib import resources
 from typing import List
 
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 
 from .resources import bible, ccn_embeddings
 from .search import BibleSearchStrategy, Match
@@ -46,7 +45,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
         def compute_similarity() -> np.ndarray:
             reserved_tokens = np.zeros((keyword_tk.size, 1))
-            in_vocab = cosine_similarity(kw_vec, self._words_vec)
+            in_vocab = pairwise_consine_similarity(kw_vec, self._words_vec)
             if len(kw_no_vec) > 0:
                 kw_oov = self._similarity_oov(kw_no_vec, self._words_vec.index)
                 all_kw = np.stack((in_vocab,  kw_oov))
@@ -93,3 +92,19 @@ class ConceptNetStrategy(BibleSearchStrategy):
         except KeyError:
             index -= len(self._words_vec)
             return self._words_no_vec[index]
+
+
+# to reduce load time of Sci-Kit Learn, consine similarity calculation was implemented
+# the result should be the same as using `sklearn.metrics.pairwise.cosine_similarity()`
+def pairwise_consine_similarity(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
+    return np.dot(normalize(X),
+                  normalize(Y).T)
+
+
+def normalize(X: np.ndarray) -> np.ndarray:
+    X = X.astype(float)
+    l2_norms = np.einsum('ij,ij->i', X, X)
+    np.sqrt(l2_norms, l2_norms)
+    l2_norms[l2_norms == 0.0] = 1.0
+    X /= l2_norms[:, np.newaxis]
+    return X
