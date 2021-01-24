@@ -31,7 +31,7 @@ class ConceptNetEmbeddings:
     def get_word_vector(self, word: str) -> pd.DataFrame:
         # TODO: OOV
         key = f'/c/zh/{to_simplified(word)}'
-        return self._store.select('/zh', f'index == key')
+        return self._store.select('/zh', 'index == key')
 
 
 def create_zh_table(conceptnet_h5: str):

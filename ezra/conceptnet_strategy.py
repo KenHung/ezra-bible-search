@@ -1,8 +1,6 @@
-import itertools
-import json
 import pickle
 from importlib import resources
-from typing import Dict, List
+from typing import List
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity

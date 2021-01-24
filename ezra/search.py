@@ -1,11 +1,7 @@
-import os
 from abc import ABC, abstractmethod
-from typing import Iterable, List, Tuple
-
-import pandas as pd
+from typing import List, Tuple
 
 from .lang import to_simplified
-from .resources import bible
 
 
 class Match:
@@ -24,7 +20,7 @@ class Match:
         return {
             'verse': self.verse,
             'score': self.score(),
-            'kw_scores': {kw: score for kw, score in self.kw_scores}
+            'kw_scores': dict(self.kw_scores)
         }
 
     def _highlight_occurrences(self, text: str) -> str:
@@ -56,6 +52,7 @@ class BibleSearchEngine:
             keyword = to_simplified(keyword)
         results = self.strategy.search(keyword, top_k)
 
+        from .resources import bible
         for match in results:
             bible_text = bible.text[match.index]
             if zh_cn:
