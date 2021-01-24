@@ -20,6 +20,13 @@ class Match:
     def score(self) -> float:
         return sum(sc for _, sc in self.kw_scores)
 
+    def to_dict(self) -> dict:
+        return {
+            'verse': self.verse,
+            'score': self.score(),
+            'kw_scores': {kw: score for kw, score in self.kw_scores}
+        }
+
     def _highlight_occurrences(self, text: str) -> str:
         for i, kw in enumerate(self.kw_scores):
             text = text.replace(kw[0],
@@ -37,10 +44,7 @@ class BibleSearchStrategy(ABC):
 
 
 class BibleSearchEngine:
-    def __init__(self, strategy: BibleSearchStrategy, bible_path: str = None):
-        if bible_path is None:
-            file_dir = os.path.dirname(__file__)
-            bible_path = os.path.join(file_dir, 'data/dnstrunv')
+    def __init__(self, strategy: BibleSearchStrategy):
         self.strategy = strategy
 
     def search(self, keyword: str, zh_cn: bool, top_k: int = 10,

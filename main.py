@@ -7,4 +7,5 @@ client = google.cloud.logging.Client()
 client.get_default_handler()
 client.setup_logging()
 
+print('Creating app in main...')
 app = create_app()
