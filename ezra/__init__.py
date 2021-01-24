@@ -5,14 +5,11 @@ from .lang import to_simplified
 from .search import BibleSearchEngine, BibleSearchStrategy, Match
 from .word_tokenizer import word_tokenize
 
-print('Ezra initializing...')
-strategy = ConceptNetStrategy.from_pickle()
-ezra_engine = BibleSearchEngine(strategy)
-
 
 def create_app():
     app = Flask(__name__)
-    app.logger.info('Creating new app...')
+    strategy = ConceptNetStrategy.from_pickle()
+    ezra_engine = BibleSearchEngine(strategy)
 
     @app.route('/')
     def hello_world():

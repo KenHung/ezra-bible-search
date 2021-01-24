@@ -3,6 +3,8 @@ from importlib import resources
 import numpy as np
 import pandas as pd
 
+from .conceptnet_embeddings import ConceptNetEmbeddings
+
 
 def in_order(nums: np.array):
     return np.array_equal(nums, range(1, nums.max() + 1))
@@ -39,3 +41,5 @@ def read_bible(bible_file) -> pd.DataFrame:
 
 with resources.path(__package__, 'fhl_unv.dsv') as f:
     bible: pd.DataFrame = read_bible(f)
+
+ccn_embeddings = ConceptNetEmbeddings()

@@ -2,38 +2,40 @@ import itertools
 import json
 import pickle
 from importlib import resources
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import numpy as np
-import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
-from .lang import to_simplified
-from .resources import bible
+from .resources import bible, ccn_embeddings
 from .search import BibleSearchStrategy, Match
 from .word_tokenizer import word_tokenize
 
 
 class ConceptNetStrategy(BibleSearchStrategy):
     def __init__(self):
-        with resources.path('ezra.resources', 'conceptnet.zh.h5') as hdf_file:
-            self._embeddings: pd.DataFrame = pd.read_hdf(hdf_file)
-        self._embeddings.index = self._embeddings.index.str.replace(
-            '/c/zh/', '')
-
+        print("Word tokenizing verses...")
         dots = r'[•‧．・\-]'
         verses = bible.text.str.replace(dots, '', regex=True)
         word_tokenized_verses = verses.transform(
             lambda v: list(word_tokenize(v)))
+
+        print("Getting word vectors...")
         all_words = np.unique(
             [word for verse in word_tokenized_verses for word in verse])
-        self._words_vec, self._words_no_vec = self._get_word_vectors(all_words)
+        self._words_vec, self._words_no_vec = ccn_embeddings.get_word_vectors(
+            all_words)
 
+        print("Tokenizing verses...")
         tokenized_verses = [list(set(map(self._tokenize, verse)))
                             for verse in word_tokenized_verses]
         max_length = max(map(len, tokenized_verses))
         self._tokenized_verses = np.array([v + [0]*(max_length-len(v))
                                            for v in tokenized_verses])
+
+    def to_pickle(self):
+        with open('conceptnet_strategy.pickle', 'wb') as f:
+            pickle.dump(self, f)
 
     @classmethod
     def from_pickle(cls):
@@ -42,9 +44,9 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
     def search(self, keyword: str, top_k: int) -> List[Match]:
         keyword_tk = np.array(list(word_tokenize(keyword)))
-        kw_vec, kw_no_vec = self._get_word_vectors(keyword_tk)
+        kw_vec, kw_no_vec = ccn_embeddings.get_word_vectors(keyword_tk)
 
-        def compute_similarity() -> pd.DataFrame:
+        def compute_similarity() -> np.ndarray:
             reserved_tokens = np.zeros((keyword_tk.size, 1))
             in_vocab = cosine_similarity(kw_vec, self._words_vec)
             if len(kw_no_vec) > 0:
@@ -75,18 +77,6 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
     def _similarity_oov(self, xs: np.array, ys: np.array) -> np.ndarray:
         return np.stack([np.where(ys == x, 1, 0) for x in xs])
-
-    def _get_word_vectors(self, words: np.array) -> Tuple[pd.DataFrame, np.array]:
-        in_vocab = [word for word in words
-                    if self._in_vocab(to_simplified(word))]
-        out_of_vocab = np.setdiff1d(words, in_vocab)
-        word_vec = self._embeddings.loc[map(to_simplified, in_vocab)]
-        word_vec.index = in_vocab
-        return word_vec, out_of_vocab
-
-    def _in_vocab(self, word: str) -> bool:
-        # TODO: OOV
-        return word in self._embeddings.index
 
     _reserved_token_length = 1
 
