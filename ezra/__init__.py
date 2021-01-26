@@ -6,16 +6,15 @@ from .word_tokenizer import word_tokenize
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='../frontend', static_url_path='/static')
 
     from .conceptnet_strategy import ConceptNetStrategy
     strategy = ConceptNetStrategy.from_pickle()
     ezra_engine = BibleSearchEngine(strategy)
 
     @app.route('/')
-    def hello_world():
-        app.logger.info("Hello Log")
-        return 'Hello, World!'
+    def index():
+        return app.send_static_file("index.html")
 
     @app.route('/api')
     def search():
