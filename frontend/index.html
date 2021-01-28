@@ -16,56 +16,30 @@
 </head>
 
 <body>
-    <div class="container p-2 p-md-3">
-        <form class="form">
+    <div id="ezra" class="container p-2 p-md-3">
+        <form class="form mb-2 mb-md-3">
             <div class="form-row">
                 <div class="col">
-                    <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                    <input class="form-control" name="keyword" type="search" inputmode="search" placeholder="Search"
+                        v-model="keyword" aria-label="Search">
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-success" type="submit">
+                    <button class="btn btn-outline-success" type="submit" @click="search">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
             </div>
         </form>
-        <div class="card my-1">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">羅馬書 12:1</h6>
-                <p class="card-text">所以，弟兄們，我以神的慈悲勸你們，將身體獻上，當作活祭，是聖潔的，是神所喜悅的；你們如此事奉乃是理所當然的。</p>
-            </div>
-        </div>
-        <div class="card my-1">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">羅馬書 12:1</h6>
-                <p class="card-text">「因為你富有的時候，不歡心樂意地事奉耶和華─你的神，</p>
-            </div>
-        </div>
-        <div class="card my-1">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">羅馬書 12:1</h6>
-                <p class="card-text">希該喜悅以斯帖，就恩待她，急忙給她需用的香品和她所當得的分，又派所當得的七個宮女服事她，使她和她的宮女搬入女院上好的房屋。</p>
-            </div>
-        </div>
-        <div class="card my-1">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">羅馬書 12:1</h6>
-                <p class="card-text">當存畏懼事奉耶和華，又當存戰兢而快樂。</p>
-            </div>
-        </div>
-        <div class="card my-1">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">羅馬書 12:1</h6>
-                <p class="card-text">所以，弟兄們，我以神的慈悲勸你們，將身體獻上，當作活祭，是聖潔的，是神所喜悅的；你們如此事奉乃是理所當然的。</p>
-            </div>
-        </div>
-        <div class="card my-1">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">羅馬書 12:1</h6>
-                <p class="card-text">所以，弟兄們，我以神的慈悲勸你們，將身體獻上，當作活祭，是聖潔的，是神所喜悅的；你們如此事奉乃是理所當然的。</p>
+        <div class="card my-1 my-md-2" v-for="result in results">
+            <div class="card-body p-2 p-md-3">
+                <h6 class="card-title mb-1 mb-md-2 text-muted">{{ result.ref }}</h6>
+                <p class="card-text">{{ result.verse }}</p>
             </div>
         </div>
     </div>
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="/static/assets/script.js"></script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
