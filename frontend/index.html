@@ -17,14 +17,14 @@
 
 <body>
     <div id="ezra" class="container p-2 p-md-3">
-        <form class="form mb-2 mb-md-3">
+        <form id="search-form" class="form mb-2 mb-md-3" @submit="search">
             <div class="form-row">
                 <div class="col">
-                    <input class="form-control" name="keyword" type="search" inputmode="search" placeholder="Search"
-                        v-model="keyword" aria-label="Search">
+                    <input class="form-control" name="q" type="search" inputmode="search" placeholder="Search"
+                        aria-label="Search" required>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-success" type="submit" @click="search">
+                    <button class="btn btn-outline-success" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>

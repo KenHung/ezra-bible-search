@@ -1,14 +1,15 @@
 const Ezra = {
     data() {
         return {
-            keyword: "",
             results: []
         }
     },
     methods: {
-        search(event) {
-            event.preventDefault();
-            fetch('/api?q=' + this.keyword)
+        search(e) {
+            e.preventDefault();
+            searchData = new FormData(document.querySelector('#search-form'))
+            searchQuery = new URLSearchParams(searchData)
+            fetch('/api?' + searchQuery)
                 .then(resp => resp.json())
                 .then(data => this.results = data.data)
         }
