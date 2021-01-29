@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 from .lang import to_simplified
 from .search import BibleSearchEngine, BibleSearchStrategy, Match
@@ -6,7 +6,10 @@ from .word_tokenizer import word_tokenize
 
 
 def create_app():
-    app = Flask(__name__, static_folder='../frontend', static_url_path='/static')
+    app = Flask(__name__,
+                static_folder='../frontend',
+                static_url_path='/static',
+                template_folder='../frontend')
 
     from .conceptnet_strategy import ConceptNetStrategy
     strategy = ConceptNetStrategy.from_pickle()
@@ -14,7 +17,11 @@ def create_app():
 
     @app.route('/')
     def index():
-        return app.send_static_file("index.html")
+        data = {
+            'keyword': request.args.get('q'),
+            'query_string': request.query_string.decode('utf-8')
+        }
+        return render_template("index.html", data=data)
 
     @app.route('/api')
     def search():
