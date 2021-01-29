@@ -11,11 +11,7 @@
         integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 
     <link href="/static/assets/css/all.min.css" rel="stylesheet">
-    <style>
-        [v-cloak] {
-            display: none;
-        }
-    </style>
+    <link href="/static/assets/css/style.css" rel="stylesheet">
 
     <title>Ezra Bible Search</title>
 </head>
@@ -43,7 +39,9 @@
             <div class="card-body p-2 p-md-3">
                 {% raw %}
                 <h6 class="card-title mb-1 mb-md-2 text-muted">{{ result.ref }}</h6>
-                <p class="card-text">{{ result.verse }}</p>
+                <p class="card-text"
+                    v-html="Object.keys(result.kw_scores).reduce(function (v, kw) { return v.replace(kw, '<em>' + kw + '</em>')}, result.verse)">
+                </p>
                 {% endraw %}
             </div>
         </div>
