@@ -35,15 +35,16 @@
                 </div>
             </div>
         </form>
-        <div class="card my-1 my-md-2" v-for="result in results" v-cloak>
+        <div v-for="result in results" v-cloak class="card my-1 my-md-2">
             <div class="card-body p-2 p-md-3">
                 {% raw %}
                 <h6 class="card-title mb-1 mb-md-2 text-muted">{{ result.ref }}</h6>
-                <p class="card-text"
-                    v-html="Object.keys(result.kw_scores).reduce(function (v, kw) { return v.replace(kw, '<em>' + kw + '</em>')}, result.verse)">
-                </p>
+                <p class="card-text" v-html="highlight(result)"></p>
                 {% endraw %}
             </div>
+        </div>
+        <div v-if="!loading && !noMoreResults" v-cloak class="row justify-content-center my-3">
+            <button type="button" class="btn btn-outline-secondary col-8" @click="pages += 1">更多結果</button>
         </div>
     </div>
 
@@ -65,28 +66,9 @@
     -->
 
     <script src="https://unpkg.com/vue@next"></script>
+    <script src="/static/assets/script.js"></script>
     <script>
-        const Ezra = {
-            data() {
-                return {
-                    results: [],
-                    loading: true
-                }
-            }
-        };
-        const vm = Vue.createApp(Ezra).mount('#ezra');
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function (e) {
-            if (xhr.status === 200) {
-                var resp = JSON.parse(xhr.responseText)
-                if (resp.status == 'success') {
-                    vm.results = resp.data
-                }
-            }
-            vm.loading = false;
-        };
-        xhr.open('GET', '/api?' + '{{ data['query_string'] }}');
-        xhr.send();
+        vm.search('{{ data['query_string'] }}');
     </script>
 </body>
 
