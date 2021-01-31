@@ -38,7 +38,9 @@
         <div v-for="result in results" v-cloak class="card my-1 my-md-2">
             <div class="card-body p-2 p-md-3">
                 {% raw %}
-                <h6 class="card-title mb-1 mb-md-2 text-muted">{{ result.ref }}</h6>
+                <h6 class="card-title mb-1 mb-md-2">
+                    <a :href="wdLink(result.ref)">{{ verseRef(result.ref) }}</a>
+                </h6>
                 <p class="card-text" v-html="highlight(result)"></p>
                 {% endraw %}
             </div>

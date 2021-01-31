@@ -9,6 +9,7 @@ class Match:
         self.index = index
         self.kw_scores = kw_scores
         self.verse = ''
+        self.ref = None
 
     def verse_hightlight(self) -> str:
         return self._highlight_occurrences(self.verse)
@@ -18,7 +19,8 @@ class Match:
 
     def to_dict(self) -> dict:
         return {
-            'verse': self.verse,
+            'text': self.verse,
+            'ref': self.ref.astype(str).str.rstrip().to_dict(),
             'score': self.score(),
             'kw_scores': dict(self.kw_scores)
         }
@@ -55,6 +57,7 @@ class BibleSearchEngine:
         from .resources import bible
         for match in results:
             bible_text = bible.text[match.index]
+            match.ref = bible.loc[match.index][['book', 'chap', 'vers']]
             if zh_cn:
                 match.verse = to_simplified(bible_text)
                 match.kw_scores = [(to_simplified(kw), score)
