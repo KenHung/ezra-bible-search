@@ -21,8 +21,13 @@
         <form id="search-form" class="form mb-2 mb-md-3">
             <div class="form-row">
                 <div class="col">
-                    <input class="form-control" name="q" type="search" inputmode="search" placeholder="Search"
-                        aria-label="Search" value="{{ data['keyword'] }}" required>
+                    <input class="form-control" name="q" ref="keyword" type="search" inputmode="search"
+                        aria-label="Search" v-model="keyword" required>
+                    <button v-if="keyword" type="button" class="btn bg-transparent"
+                        style="position: absolute; top: 0; right: 5px; z-index: 10; color: grey;"
+                        @click="clearSearch()">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
                 </div>
                 <div class="col-auto">
                     <button v-if="loading" class="btn btn-outline-success" type="button" disabled>
@@ -70,6 +75,7 @@
     <script src="https://unpkg.com/vue@next"></script>
     <script src="/static/assets/script.js"></script>
     <script>
+        vm.keyword = '{{ data['keyword'] }}';
         vm.search('{{ data['query_string'] }}');
     </script>
 </body>

@@ -4,6 +4,7 @@ const Ezra = {
     data() {
         return {
             loading: true,
+            keyword: '',
             allResults: [],
             pages: 1
         }
@@ -44,6 +45,10 @@ const Ezra = {
                 text = text.replace(new RegExp(kw, 'g'), '<em>' + kw + '</em>');
             }
             return text;
+        },
+        clearSearch() {
+            this.keyword = '';
+            this.$refs.keyword.focus();
         }
     }
 };
