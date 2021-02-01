@@ -48,7 +48,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
             in_vocab = pairwise_consine_similarity(kw_vec, self._words_vec)
             if len(kw_no_vec) > 0:
                 kw_oov = self._similarity_oov(kw_no_vec, self._words_vec.index)
-                all_kw = np.stack((in_vocab,  kw_oov))
+                all_kw = np.vstack((in_vocab,  kw_oov))
             else:
                 all_kw = in_vocab
             verse_oov = self._similarity_oov(keyword_tk, self._words_no_vec)
@@ -89,7 +89,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
         index = token - ConceptNetStrategy._reserved_token_length
         try:
             return self._words_vec.index[index]
-        except KeyError:
+        except IndexError:
             index -= len(self._words_vec)
             return self._words_no_vec[index]
 
