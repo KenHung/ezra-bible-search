@@ -3,16 +3,14 @@ from contextlib import redirect_stdout
 from itertools import combinations
 
 from ezra import BibleSearchEngine
-from hanziconv import HanziConv
-from tqdm import tqdm
 from ezra.conceptnet_strategy import ConceptNetStrategy
+from tqdm import tqdm
 
 strategy = ConceptNetStrategy.from_pickle()
 
 ezra_engine = BibleSearchEngine(strategy)
 keywords = open('word_tokens.txt').read().splitlines()
-keywords_s = map(HanziConv.toSimplified, keywords)
-kw_pairs = list(combinations(keywords_s, 2))
+kw_pairs = list(combinations(keywords, 2))
 
 with open('evaluation.ans', 'w') as outfile:
     with redirect_stdout(outfile):

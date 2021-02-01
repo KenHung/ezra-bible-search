@@ -55,10 +55,15 @@ class ConceptNetStrategy(BibleSearchStrategy):
             return np.hstack((reserved_tokens, all_kw, verse_oov))
         similarity = compute_similarity()
 
+        # there are two parts of score: cosine similarity and count of good keywords
         all_match_scores = similarity[:, self._tokenized_verses]
         kw_verse_scores = np.amax(all_match_scores, axis=2)
-        verse_scores = kw_verse_scores.sum(axis=0)
-        top_matches = np.argsort(verse_scores)[-1:-top_k-1:-1]
+        verse_scores = np.core.records.fromarrays([
+            kw_verse_scores.sum(axis=0),
+            np.where(kw_verse_scores >= 0.5, 1, 0).sum(axis=0)
+        ], names='total,good_kw_counts')
+        top_matches = np.argsort(verse_scores,
+                                 order=['good_kw_counts', 'total'])[-1:-top_k-1:-1]
 
         def create_match(index: int) -> Match:
             tokens = self._tokenized_verses[index]
