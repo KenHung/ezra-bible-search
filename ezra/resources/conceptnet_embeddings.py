@@ -9,8 +9,8 @@ from ..lang import to_simplified
 
 class ConceptNetEmbeddings:
     def __init__(self):
-        with resources.path(__package__, 'conceptnet.zh.h5') as h5_path:
-            self._store: pd.DataFrame = pd.HDFStore(h5_path, mode='r')
+        with resources.path(__package__, "conceptnet.zh.h5") as h5_path:
+            self._store: pd.DataFrame = pd.HDFStore(h5_path, mode="r")
 
     def get_word_vectors(self, words: Iterable[str]) -> Tuple[pd.DataFrame, np.array]:
         in_vocab = []
@@ -30,11 +30,11 @@ class ConceptNetEmbeddings:
 
     def get_word_vector(self, word: str) -> pd.DataFrame:
         # TODO: OOV
-        key = f'/c/zh/{to_simplified(word)}'
-        return self._store.select('/zh', 'index == key')
+        key = f"/c/zh/{to_simplified(word)}"
+        return self._store.select("/zh", "index == key")
 
 
 def create_zh_table(conceptnet_h5: str):
     full = pd.read_hdf(conceptnet_h5)
-    zh = full.index.str.startswith('/c/zh')
-    full[zh].to_hdf('conceptnet.zh.h5', 'zh', format='table')
+    zh = full.index.str.startswith("/c/zh")
+    full[zh].to_hdf("conceptnet.zh.h5", "zh", format="table")
