@@ -105,7 +105,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
             return self._words_no_vec[index]
 
 
-# to reduce load time of Sci-Kit Learn, consine similarity calculation was implemented
+# to reduce load time of Sci-Kit Learn, cosine similarity calculation was implemented
 # the result should be the same as using `sklearn.metrics.pairwise.cosine_similarity()`
 def pairwise_consine_similarity(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
     return np.dot(normalize(X), normalize(Y).T)

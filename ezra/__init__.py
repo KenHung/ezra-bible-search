@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template
 
-from .lang import to_simplified
-from .search import BibleSearchEngine, BibleSearchStrategy, Match
-from .word_tokenizer import word_tokenize
+from .lang import to_simplified  # noqa: F401
+from .search import BibleSearchEngine, BibleSearchStrategy, Match  # noqa: F401
+from .word_tokenizer import word_tokenize  # noqa: F401
 
 
 def create_app():
