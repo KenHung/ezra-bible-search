@@ -1,8 +1,9 @@
 from importlib import resources
-from typing import Iterable, Tuple
+from typing import Iterable
 
 import numpy as np
 import pandas as pd
+import tables
 
 from ..lang import to_simplified
 
@@ -10,28 +11,21 @@ from ..lang import to_simplified
 class ConceptNetEmbeddings:
     def __init__(self):
         with resources.path(__package__, "conceptnet.zh.h5") as h5_path:
-            self._store: pd.DataFrame = pd.HDFStore(h5_path, mode="r")
+            h5f = tables.open_file(h5_path)
+            self._tbl = h5f.root.zh.table
 
-    def get_word_vectors(self, words: Iterable[str]) -> Tuple[pd.DataFrame, np.array]:
-        in_vocab = []
-        word_vec_list = []
-        out_of_vocab = []
-        for word in words:
-            vec = self.get_word_vector(word)
-            if not vec.empty:
-                in_vocab.append(word)
-                word_vec_list.append(vec)
-            else:
-                out_of_vocab.append(word)
+    def get_word_vectors(self, words: Iterable[str]) -> np.ndarray:
+        vectors = list(map(self.get_word_vector, words))
+        return np.vstack(vectors)
 
-        word_vec = pd.concat(word_vec_list)
-        word_vec.index = in_vocab
-        return word_vec, np.array(out_of_vocab)
-
-    def get_word_vector(self, word: str) -> pd.DataFrame:
-        # TODO: OOV
-        key = f"/c/zh/{to_simplified(word)}"
-        return self._store.select("/zh", "index == key")
+    def get_word_vector(self, word: str) -> np.ndarray:
+        key = f"/c/zh/{to_simplified(word)}".encode()  # noqa: F841
+        records = self._tbl.read_where("index == key")
+        if len(records) > 0:
+            word, vector = records[0]
+            return vector
+        else:
+            return np.zeros(300, "i1")
 
 
 def create_zh_table(conceptnet_h5: str):

@@ -10,4 +10,4 @@ def test_search_zh_cn(ezra_engine):
 
 def test_search_oov(ezra_engine):
     result = ezra_engine.search("苦害 銅匠", zh_cn=False, verbose=True)
-    assert "銅匠" in result[0].verse
+    assert "苦害" in result[0].verse

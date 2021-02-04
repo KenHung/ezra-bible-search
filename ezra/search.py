@@ -50,8 +50,6 @@ class BibleSearchEngine:
         """
         Search for verses that match the keyword
         """
-        if not zh_cn:
-            keyword = to_simplified(keyword)
         results = self.strategy.search(keyword, top_k)
 
         from .resources import bible

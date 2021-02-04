@@ -17,10 +17,10 @@ class ConceptNetStrategy(BibleSearchStrategy):
         word_tokenized_verses = verses.transform(lambda v: list(word_tokenize(v)))
 
         print("Getting word vectors...")
-        all_words = np.unique(
+        self._all_words = np.unique(
             [word for verse in word_tokenized_verses for word in verse]
         )
-        self._words_vec, self._words_no_vec = ccn_embeddings.get_word_vectors(all_words)
+        self._words_vec = ccn_embeddings.get_word_vectors(self._all_words)
 
         print("Tokenizing verses...")
         tokenized_verses = [
@@ -42,18 +42,14 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
     def search(self, keyword: str, top_k: int) -> List[Match]:
         keyword_tk = np.array(list(word_tokenize(keyword)))
-        kw_vec, kw_no_vec = ccn_embeddings.get_word_vectors(keyword_tk)
+        kw_vec = ccn_embeddings.get_word_vectors(keyword_tk)
 
         def compute_similarity() -> np.ndarray:
             reserved_tokens = np.zeros((keyword_tk.size, 1))
-            in_vocab = pairwise_consine_similarity(kw_vec, self._words_vec)
-            if len(kw_no_vec) > 0:
-                kw_oov = self._similarity_oov(kw_no_vec, self._words_vec.index)
-                all_kw = np.vstack((in_vocab, kw_oov))
-            else:
-                all_kw = in_vocab
-            verse_oov = self._similarity_oov(keyword_tk, self._words_no_vec)
-            return np.hstack((reserved_tokens, all_kw, verse_oov))
+            exact = pairwise_equal(keyword_tk, self._all_words)
+            cosine = pairwise_cosine_similarity(kw_vec, self._words_vec)
+            concat = np.where(exact, 1, cosine)
+            return np.hstack((reserved_tokens, concat))
 
         similarity = compute_similarity()
 
@@ -83,31 +79,25 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
         return [create_match(i) for i in top_matches]
 
-    def _similarity_oov(self, xs: np.array, ys: np.array) -> np.ndarray:
-        return np.stack([np.where(ys == x, 1, 0) for x in xs])
-
+    # reserve token for padding
     _reserved_token_length = 1
 
     def _tokenize(self, word: str) -> int:
-        try:
-            index_by_vocab = self._words_vec.index.get_loc(word)
-        except KeyError:
-            no_vec_index = np.where(self._words_no_vec == word)[0][0]
-            index_by_vocab = no_vec_index + len(self._words_vec)
-        return ConceptNetStrategy._reserved_token_length + index_by_vocab
+        index = np.argmax(self._all_words == word)
+        return ConceptNetStrategy._reserved_token_length + index
 
     def _detokenize(self, token: int) -> str:
         index = token - ConceptNetStrategy._reserved_token_length
-        try:
-            return self._words_vec.index[index]
-        except IndexError:
-            index -= len(self._words_vec)
-            return self._words_no_vec[index]
+        return self._all_words[index]
+
+
+def pairwise_equal(xs: np.array, ys: np.array) -> np.ndarray:
+    return np.stack([ys == x for x in xs])
 
 
 # to reduce load time of Sci-Kit Learn, cosine similarity calculation was implemented
 # the result should be the same as using `sklearn.metrics.pairwise.cosine_similarity()`
-def pairwise_consine_similarity(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
+def pairwise_cosine_similarity(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
     return np.dot(normalize(X), normalize(Y).T)
 
 
