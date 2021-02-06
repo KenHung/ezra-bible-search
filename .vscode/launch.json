@@ -9,6 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "flask",
+            "python": "${workspaceFolder}/venv/bin/python",
             "env": {
                 "FLASK_APP": "ezra",
                 "FLASK_ENV": "development",

@@ -4,13 +4,15 @@ from typing import List
 
 import numpy as np
 
-from .resources import bible, ccn_embeddings
+from .resources.db import ccn_embeddings
 from .search import BibleSearchStrategy, Match
 from .word_tokenizer import word_tokenize
 
 
 class ConceptNetStrategy(BibleSearchStrategy):
     def __init__(self):
+        from .resources import bible
+
         print("Word tokenizing verses...")
         dots = r"[•‧．・\-]"
         verses = bible.text.str.replace(dots, "", regex=True)
@@ -31,8 +33,8 @@ class ConceptNetStrategy(BibleSearchStrategy):
             [v + [0] * (max_length - len(v)) for v in tokenized_verses]
         )
 
-    def to_pickle(self):
-        with open("conceptnet_strategy.pickle", "wb") as f:
+    def to_pickle(self, path: str):
+        with open(path, "wb") as f:
             pickle.dump(self, f)
 
     @classmethod

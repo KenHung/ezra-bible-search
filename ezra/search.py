@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple
 
 from .lang import to_simplified
+from .resources.db import bible
 
 
 class Match:
@@ -20,7 +21,7 @@ class Match:
     def to_dict(self) -> dict:
         return {
             "text": self.verse,
-            "ref": self.ref.astype(str).str.rstrip().to_dict(),
+            "ref": self.ref,
             "score": self.score(),
             "kw_scores": dict(self.kw_scores),
         }
@@ -52,11 +53,8 @@ class BibleSearchEngine:
         """
         results = self.strategy.search(keyword, top_k)
 
-        from .resources import bible
-
         for match in results:
-            bible_text = bible.text[match.index]
-            match.ref = bible.loc[match.index][["book", "chap", "vers"]]
+            match.ref, bible_text = bible.get_record(match.index)
             if zh_cn:
                 match.verse = to_simplified(bible_text)
                 match.kw_scores = [
