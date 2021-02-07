@@ -17,31 +17,44 @@
 </head>
 
 <body>
-    <div id="ezra" class="container p-2 p-md-3">
+    <div id="ezra" class="container-md p-2 p-md-3">
+        <form id="search-form" class="form mb-2">
+            <div class="form-row">
+                <div class="col">
+                    <input class="form-control" name="q" ref="keyword" type="search" inputmode="search"
+                        aria-label="Search" v-model="keyword" required>
+                    <button v-if="keyword" type="button" class="btn bg-transparent"
+                        style="position: absolute; top: 0; right: 5px; z-index: 10; color: grey;"
+                        @click="clearSearch()">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button v-if="loading" class="btn btn-outline-success" type="button" disabled>
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="sr-only">Loading...</span>
+                    </button>
+                    <button v-else v-cloak class="btn btn-outline-success" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="nav-scroller mb-1">
+            <nav class="nav">
+                <a href="#" class="active">全部 <span class="sr-only">(*)</span></a>
+                <a href="#" class="">新約</a>
+                <a href="#" class="">舊約</a>
+                <a href="#" class="">四福音</a>
+                <a href="#" class="">書信</a>
+                <a href="#" class="">摩西五經</a>
+                <a href="#" class="">歷史書</a>
+                <a href="#" class="">詩歌/智慧書</a>
+                <a href="#" class="">先知書</a>
+            </nav>
+        </div>
         <div class="row no-gutters">
             <div class="col">
-                <form id="search-form" class="form mb-2 mb-md-3">
-                    <div class="form-row">
-                        <div class="col">
-                            <input class="form-control" name="q" ref="keyword" type="search" inputmode="search"
-                                aria-label="Search" v-model="keyword" required>
-                            <button v-if="keyword" type="button" class="btn bg-transparent"
-                                style="position: absolute; top: 0; right: 5px; z-index: 10; color: grey;"
-                                @click="clearSearch()">
-                                <i class="fas fa-times-circle"></i>
-                            </button>
-                        </div>
-                        <div class="col-auto">
-                            <button v-if="loading" class="btn btn-outline-success" type="button" disabled>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                <span class="sr-only">Loading...</span>
-                            </button>
-                            <button v-else v-cloak class="btn btn-outline-success" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
                 <div v-for="result in results" v-cloak class="card my-1 my-md-2">
                     <div class="card-body p-2 p-md-3">
                         {% raw %}

@@ -21,3 +21,34 @@ a:visited {
 a:hover {
     text-decoration: underline;
 }
+
+.nav-scroller {
+    font-size: .875rem;
+    height: 2em;
+    overflow-y: hidden;
+}
+
+.nav-scroller .nav {
+    flex-wrap: nowrap;
+    padding-bottom: 1rem;
+    margin-top: -1px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.nav-scroller a {
+    padding: .25em 0;
+    margin: 0 .5em;
+    color: #6c757d;
+    border-bottom-width: 2px;
+}
+
+.nav-scroller a.active {
+    color: black;
+    border-bottom-style: solid;
+}
+
+.nav-scroller a:hover {
+    border-bottom-style: solid;
+    text-decoration: none;
+}
