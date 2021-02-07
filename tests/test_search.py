@@ -11,3 +11,11 @@ def test_search_zh_cn(ezra_engine):
 def test_search_oov(ezra_engine):
     result = ezra_engine.search("苦害 銅匠", zh_cn=False, verbose=True)
     assert "苦害" in result[0].verse
+
+
+def test_search_exact(ezra_engine):
+    result = ezra_engine.search("聰明俊美", zh_cn=False, verbose=True, top_k=25)
+    assert "聰明俊美" in result[0].verse
+    assert "聰明" in result[1].verse
+    assert "俊美" in result[1].verse
+    assert len(result) == 25

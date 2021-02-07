@@ -10,15 +10,24 @@ from ..lang import to_simplified
 class Bible:
     def __init__(self, db: tables.File):
         self._unv = db.root.unv.table
+        self._book = db.root.unv.meta.book.meta.table
 
     def get_record(self, index: int):
-        record = self._unv[index]
-        _, (chap, vers), (book, text) = record
+        _, (chap, vers), book_index, text = self._unv[index]
+        _, book = self._book[book_index]
         return {
             "book": book.decode(),
             "chap": int(chap),
             "vers": int(vers),
         }, text.decode()
+
+    def exact_match(self, keyword: str) -> np.ndarray:
+        cond = "&".join(["contains(text, %r)" % kw.encode() for kw in keyword.split()])
+        return self._unv.read_where(cond, field="index")
+
+    def book_ranges(self, in_book: str) -> np.ndarray:
+        book_index = self._book.read_where("values == in_book")  # noqa: F841
+        return self._unv.read_where("book == book_index", field="index")
 
 
 class ConceptNetEmbeddings:

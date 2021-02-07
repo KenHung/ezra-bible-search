@@ -11,7 +11,7 @@ def create_zh_table(conceptnet_h5: str, db_file):
 
 
 def create_unv_table(db_file):
-    bible.df.to_hdf(db_file, "unv", format="table")
+    bible.df.to_hdf(db_file, "unv", format="table", data_columns=["book", "text"])
 
 
 if __name__ == "__main__":

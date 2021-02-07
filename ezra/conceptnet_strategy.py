@@ -42,7 +42,13 @@ class ConceptNetStrategy(BibleSearchStrategy):
         with resources.open_binary("ezra.resources", "conceptnet_strategy.pickle") as f:
             return pickle.load(f)
 
-    def search(self, keyword: str, top_k: int) -> List[Match]:
+    def search(
+        self,
+        keyword: str,
+        top_k: int,
+        in_range: np.ndarray = None,
+        skip: np.ndarray = None,
+    ) -> List[Match]:
         keyword_tk = np.array(list(word_tokenize(keyword)))
         kw_vec = ccn_embeddings.get_word_vectors(keyword_tk)
 
@@ -56,7 +62,15 @@ class ConceptNetStrategy(BibleSearchStrategy):
         similarity = compute_similarity()
 
         # there are two parts of score: cosine similarity and count of good keywords
-        all_match_scores = similarity[:, self._tokenized_verses]
+        if skip is not None:
+            not_skip = np.setdiff1d(np.arange(len(self._tokenized_verses)), skip)
+            in_range = np.union1d(in_range, not_skip) if in_range else not_skip
+        verses_in_range = (
+            self._tokenized_verses[in_range]
+            if in_range is not None
+            else self._tokenized_verses
+        )
+        all_match_scores = similarity[:, verses_in_range]
         kw_verse_scores = np.amax(all_match_scores, axis=2)
         verse_scores = np.core.records.fromarrays(
             [
@@ -70,14 +84,14 @@ class ConceptNetStrategy(BibleSearchStrategy):
         ]
 
         def create_match(index: int) -> Match:
-            tokens = self._tokenized_verses[index]
+            tokens = verses_in_range[index]
             kw_scores = []
             for kw in range(len(keyword_tk)):
                 scores = similarity[kw, tokens]
                 match_word = np.argmax(scores)
                 match_token = tokens[match_word]
                 kw_scores.append((self._detokenize(match_token), scores[match_word]))
-            return Match(index, kw_scores)
+            return Match(in_range[index] if in_range is not None else index, kw_scores)
 
         return [create_match(i) for i in top_matches]
 

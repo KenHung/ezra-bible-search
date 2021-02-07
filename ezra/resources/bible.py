@@ -25,7 +25,7 @@ def read_bible(bible_file) -> pd.DataFrame:
         names=list(types.keys()),
         dtype=types,
     )
-    bible["book"] = bible.book.str.rstrip()
+    bible["book"] = bible.book.str.rstrip().astype("category")
     bible.sort_values("index", inplace=True)
     bible.reset_index(drop=True, inplace=True)
 

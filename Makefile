@@ -17,5 +17,5 @@ ezra/resources/conceptnet_strategy.pickle:
 test:
 	pytest tests
 
-deploy:
+deploy: test
 	gcloud app deploy

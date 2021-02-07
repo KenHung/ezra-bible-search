@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
+import numpy as np
+
 from .lang import to_simplified
-from .resources.db import bible
 
 
 class Match:
@@ -37,7 +38,13 @@ class Match:
 
 class BibleSearchStrategy(ABC):
     @abstractmethod
-    def search(self, keyword: str, top_k: int) -> List[Match]:
+    def search(
+        self,
+        keyword: str,
+        top_k: int,
+        in_range: np.ndarray = None,
+        skip: np.ndarray = None,
+    ) -> List[Match]:
         return NotImplemented
 
 
@@ -51,7 +58,18 @@ class BibleSearchEngine:
         """
         Search for verses that match the keyword
         """
-        results = self.strategy.search(keyword, top_k)
+        from .resources.db import bible
+
+        exact = bible.exact_match(keyword)
+        kw_scores_exact = [(kw, 1.0) for kw in keyword.split()]
+        exact_matches = [Match(index, kw_scores_exact) for index in exact]
+        if len(exact) < top_k:
+            fuzzy_matches = self.strategy.search(
+                keyword, top_k - len(exact), skip=exact
+            )
+            results = exact_matches + fuzzy_matches
+        else:
+            results = exact_matches[:top_k]
 
         for match in results:
             match.ref, bible_text = bible.get_record(match.index)
