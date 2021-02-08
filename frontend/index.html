@@ -21,7 +21,7 @@
         <form id="search-form" class="form mb-2">
             <div class="form-row">
                 <div class="col">
-                    <input class="form-control" name="q" ref="keyword" type="search" inputmode="search"
+                    <input class="form-control shadow-sm" name="q" ref="keyword" type="search" inputmode="search"
                         aria-label="Search" v-model="keyword" required>
                     <button v-if="keyword" type="button" class="btn bg-transparent"
                         style="position: absolute; top: 0; right: 5px; z-index: 10; color: grey;"
@@ -30,11 +30,11 @@
                     </button>
                 </div>
                 <div class="col-auto">
-                    <button v-if="loading" class="btn btn-outline-success" type="button" disabled>
+                    <button v-if="loading" class="btn btn-outline-success shadow-sm" type="button" disabled>
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                         <span class="sr-only">Loading...</span>
                     </button>
-                    <button v-else v-cloak class="btn btn-outline-success" type="submit">
+                    <button v-else v-cloak class="btn btn-outline-success shadow-sm" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
@@ -55,7 +55,7 @@
         </div>
         <div class="row no-gutters">
             <div class="col">
-                <div v-for="result in results" v-cloak class="card my-1 my-md-2">
+                <div v-for="result in results" v-cloak class="card my-1 my-md-2 shadow-sm">
                     <div class="card-body p-2 p-md-3">
                         {% raw %}
                         <h6 class="card-title mb-1 mb-md-2">
