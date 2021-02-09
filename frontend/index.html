@@ -11,7 +11,7 @@
         integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 
     <link href="/static/assets/css/all.min.css" rel="stylesheet">
-    <link href="/static/assets/css/style.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
 
     <title>Ezra Bible Search</title>
 </head>
@@ -85,7 +85,7 @@
     -->
 
     <script src="https://unpkg.com/vue@next"></script>
-    <script src="/static/assets/script.js"></script>
+    <script src="{{ url_for('static', filename='assets/script.js') }}"></script>
     <script>
         vm.keyword = '{{ data['keyword'] }}';
         vm.search(window.location.search);
