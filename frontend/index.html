@@ -40,33 +40,28 @@
                 </div>
             </div>
         </form>
+        {% raw %}
         <div class="nav-scroller mb-1">
             <nav class="nav">
-                <a href="#" class="active">全部 <span class="sr-only">(*)</span></a>
-                <a href="#" class="">新約</a>
-                <a href="#" class="">舊約</a>
-                <a href="#" class="">四福音</a>
-                <a href="#" class="">書信</a>
-                <a href="#" class="">摩西五經</a>
-                <a href="#" class="">歷史書</a>
-                <a href="#" class="">詩歌/智慧書</a>
-                <a href="#" class="">先知書</a>
+                <a v-for="(display, range) in searchRanges" :href="searchRangeQuery(range)"
+                    :class="{ active: rangeSelected(range) }" v-cloak>
+                    {{ display }} <span v-if="rangeSelected(range)" class="sr-only">(*)</span>
+                </a>
             </nav>
         </div>
         <div class="row no-gutters">
             <div class="col">
                 <div v-for="result in results" v-cloak class="card my-1 my-md-2 shadow-sm">
                     <div class="card-body p-2 p-md-3">
-                        {% raw %}
                         <h6 class="card-title mb-1 mb-md-2">
                             <a :href="wdLink(result.ref)">{{ verseRef(result.ref) }}</a>
                         </h6>
                         <p class="card-text" v-html="highlight(result)"></p>
-                        {% endraw %}
                     </div>
                 </div>
             </div>
         </div>
+        {% endraw %}
         <div v-if="!loading && !noMoreResults" v-cloak class="row no-gutters justify-content-center my-3">
             <button type="button" class="btn btn-outline-secondary col-8" @click="pages += 1">更多結果</button>
         </div>
@@ -93,7 +88,7 @@
     <script src="/static/assets/script.js"></script>
     <script>
         vm.keyword = '{{ data['keyword'] }}';
-        vm.search('{{ data['query_string'] }}');
+        vm.search(window.location.search);
     </script>
 </body>
 

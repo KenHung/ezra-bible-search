@@ -43,11 +43,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
             return pickle.load(f)
 
     def search(
-        self,
-        keyword: str,
-        top_k: int,
-        in_range: np.ndarray = None,
-        skip: np.ndarray = None,
+        self, keyword: str, top_k: int, in_range: np.ndarray = None
     ) -> List[Match]:
         keyword_tk = np.array(list(word_tokenize(keyword)))
         kw_vec = ccn_embeddings.get_word_vectors(keyword_tk)
@@ -61,15 +57,12 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
         similarity = compute_similarity()
 
-        # there are two parts of score: cosine similarity and count of good keywords
-        if skip is not None:
-            not_skip = np.setdiff1d(np.arange(len(self._tokenized_verses)), skip)
-            in_range = np.union1d(in_range, not_skip) if in_range else not_skip
         verses_in_range = (
             self._tokenized_verses[in_range]
             if in_range is not None
             else self._tokenized_verses
         )
+        # there are two parts of score: cosine similarity and count of good keywords
         all_match_scores = similarity[:, verses_in_range]
         kw_verse_scores = np.amax(all_match_scores, axis=2)
         verse_scores = np.core.records.fromarrays(

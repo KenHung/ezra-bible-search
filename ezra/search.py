@@ -38,13 +38,7 @@ class Match:
 
 class BibleSearchStrategy(ABC):
     @abstractmethod
-    def search(
-        self,
-        keyword: str,
-        top_k: int,
-        in_range: np.ndarray = None,
-        skip: np.ndarray = None,
-    ) -> List[Match]:
+    def search(self, keyword: str, top_k: int, range: np.ndarray = None) -> List[Match]:
         return NotImplemented
 
 
@@ -53,19 +47,32 @@ class BibleSearchEngine:
         self.strategy = strategy
 
     def search(
-        self, keyword: str, zh_cn: bool, top_k: int = 10, verbose: bool = False
+        self,
+        keyword: str,
+        zh_cn: bool,
+        in_book: str = None,
+        top_k: int = 10,
+        verbose: bool = False,
     ) -> List[Match]:
         """
         Search for verses that match the keyword
         """
         from .resources.db import bible
 
-        exact = bible.exact_match(keyword)
+        exact_idx = bible.exact_match(keyword)
+        if not in_book:
+            search_range = (
+                np.setdiff1d(bible.idx, exact_idx) if len(exact_idx) > 0 else None
+            )
+        else:
+            book_range = bible.book_idx(in_book)
+            exact_idx = np.intersect1d(exact_idx, book_range)
+            search_range = np.setdiff1d(book_range, exact_idx)
         kw_scores_exact = [(kw, 1.0) for kw in keyword.split()]
-        exact_matches = [Match(index, kw_scores_exact) for index in exact]
-        if len(exact) < top_k:
+        exact_matches = [Match(index, kw_scores_exact) for index in exact_idx]
+        if len(exact_idx) < top_k:
             fuzzy_matches = self.strategy.search(
-                keyword, top_k - len(exact), skip=exact
+                keyword, top_k - len(exact_idx), search_range
             )
             results = exact_matches + fuzzy_matches
         else:

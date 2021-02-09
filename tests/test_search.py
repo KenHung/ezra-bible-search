@@ -19,3 +19,8 @@ def test_search_exact(ezra_engine):
     assert "聰明" in result[1].verse
     assert "俊美" in result[1].verse
     assert len(result) == 25
+
+
+def test_search_range(ezra_engine):
+    result = ezra_engine.search("福音", zh_cn=False, in_book="letters", verbose=True)
+    assert result[0].ref["book"] == "rom"

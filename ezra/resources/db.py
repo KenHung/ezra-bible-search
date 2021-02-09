@@ -1,3 +1,4 @@
+import atexit
 from importlib import resources
 from typing import Iterable
 
@@ -5,12 +6,14 @@ import numpy as np
 import tables
 
 from ..lang import to_simplified
+from . import abbr
 
 
 class Bible:
     def __init__(self, db: tables.File):
         self._unv = db.root.unv.table
         self._book = db.root.unv.meta.book.meta.table
+        self.idx = np.arange(self._unv.nrows)
 
     def get_record(self, index: int):
         _, (chap, vers), book_index, text = self._unv[index]
@@ -22,12 +25,15 @@ class Bible:
         }, text.decode()
 
     def exact_match(self, keyword: str) -> np.ndarray:
-        cond = "&".join(["contains(text, %r)" % kw.encode() for kw in keyword.split()])
+        cond = "&".join("contains(text, %r)" % kw.encode() for kw in keyword.split())
         return self._unv.read_where(cond, field="index")
 
-    def book_ranges(self, in_book: str) -> np.ndarray:
-        book_index = self._book.read_where("values == in_book")  # noqa: F841
-        return self._unv.read_where("book == book_index", field="index")
+    def book_idx(self, in_book: str) -> np.ndarray:
+        books = np.char.encode(abbr.ranges.get(in_book, [in_book]))
+        all_books = self._book.read(field="values")
+        book_indices = np.argwhere(np.isin(all_books, books))
+        book_col = self._unv.read(field="book")
+        return np.argwhere(np.isin(book_col, book_indices))
 
 
 class ConceptNetEmbeddings:
@@ -50,5 +56,6 @@ class ConceptNetEmbeddings:
 
 with resources.path(__package__, "db.h5") as h5_path:
     _db = tables.open_file(h5_path)
+    atexit.register(_db.close)
     bible = Bible(_db)
     ccn_embeddings = ConceptNetEmbeddings(_db)
