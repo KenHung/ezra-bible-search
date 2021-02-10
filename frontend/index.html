@@ -17,7 +17,36 @@
 </head>
 
 <body>
-    <div id="ezra" class="container-md p-2 p-md-3">
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">關於 Ezra</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Ezra 聖經語意搜尋，應用自然語言處理技術的經文搜尋器。</p>
+                    <p>版權所有 © 2021 Ken Hung</p>
+                    <p>本程式是自由軟件，你可以根據 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL</a>
+                        條款（自由軟體基金會公佈的第三版或是你選擇的後續版本）修改和再發佈它，源代碼位置：
+                        <a href="https://github.com/KenHung/ezra-bible-search"
+                            target="_blank">https://github.com/KenHung/ezra-bible-search</a>
+                    </p>
+                    <p>
+                        如有任何問題，可以通過這個電郵聯絡：<a href="mailto:eiekenhung@gmail.com" target="_blank">eiekenhung@gmail.com</a>
+                    </p>
+                    <hr>
+                    <p class="mb-0">本程式旨在幫助人明白聖經，但是並不包含任何擔保，搜尋結果可能不準確，歡迎來信指正，惟願上帝賜福予使用者。具體免責聲明請檢視 AGPL 條款。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="ezra" class="container p-2 p-sm-3">
         <form id="search-form" class="form mb-2">
             <div class="form-row">
                 <div class="col">
@@ -51,9 +80,9 @@
         </div>
         <div class="row no-gutters">
             <div class="col">
-                <div v-for="result in results" v-cloak class="card my-1 my-md-2 shadow-sm">
-                    <div class="card-body p-2 p-md-3">
-                        <h6 class="card-title mb-1 mb-md-2">
+                <div v-for="result in results" v-cloak class="card my-1 my-sm-2 shadow-sm">
+                    <div class="card-body p-2 p-sm-3">
+                        <h6 class="card-title mb-1 mb-sm-2">
                             <a :href="wdLink(result.ref)">{{ verseRef(result.ref) }}</a>
                         </h6>
                         <p class="card-text" v-html="highlight(result)"></p>
@@ -65,24 +94,21 @@
         <div v-if="!loading && !noMoreResults" v-cloak class="row no-gutters justify-content-center my-3">
             <button type="button" class="btn btn-outline-secondary col-8" @click="pages += 1">更多結果</button>
         </div>
+        <hr>
+        <footer class="d-flex-column justify-content-center">
+            <p>Ezra 聖經語意搜尋 © 2021 Ken Hung</p>
+            <p>
+                本程式及其源代碼以 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL</a> 條款授權，詳情見
+                <a href="#" data-toggle="modal" data-target="#aboutModal">關於 Ezra</a>。
+            </p>
+            <p>
+                搜尋採用 <a href="https://github.com/commonsense/conceptnet-numberbatch" target="_blank">ConceptNet
+                    Numberbatch</a>
+                語意模型，由 <a href="https://www.luminoso.com/" target="_blank">Luminoso Technologies, Inc.</a> 以
+                <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-By-SA 4.0</a> 條款授權。
+            </p>
+        </footer>
     </div>
-
-    <!-- Optional JavaScript; choose one of the two! -->
-
-    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
-        crossorigin="anonymous"></script>
-
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
-    -->
 
     <script src="https://unpkg.com/vue@next"></script>
     <script src="{{ url_for('static', filename='assets/script.js') }}"></script>
@@ -90,6 +116,14 @@
         vm.keyword = '{{ data['keyword'] }}';
         vm.search(window.location.search);
     </script>
+
+    <!-- jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>

@@ -2,6 +2,10 @@
     display: none;
 }
 
+#ezra {
+    max-width: 600px;
+}
+
 em {
     color: #ea4335;
     font-weight: normal;
@@ -51,4 +55,12 @@ a:hover {
 .nav-scroller a:hover {
     border-bottom-style: solid;
     text-decoration: none;
+}
+
+footer {
+    font-size: .8rem;
+}
+
+footer p {
+    margin-bottom: .5em;
 }
