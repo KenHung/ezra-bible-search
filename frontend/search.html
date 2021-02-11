@@ -52,7 +52,7 @@
 {% endblock %}
 {% block script %}
 <script src="https://unpkg.com/vue@next"></script>
-<script src="{{ url_for('static', filename='assets/script.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/script.js', version=version) }}"></script>
 <script>
     vm.keyword = '{{ keyword }}';
     vm.search(window.location.search);

@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, render_template, request
 
 from .lang import to_simplified  # noqa: F401
@@ -21,11 +23,16 @@ def create_app():
 
     @app.route("/")
     def index():
+        try:
+            with open("source-context.json") as f:
+                version = json.load(f)["git"]["revisionId"][:7]
+        except FileNotFoundError:
+            version = ""
         keyword = request.args.get("q", "")
         if not keyword:
-            return render_template("index.html")
+            return render_template("index.html", version=version)
         else:
-            return render_template("search.html", keyword=keyword)
+            return render_template("search.html", version=version, keyword=keyword)
 
     @app.route("/api")
     def search():
