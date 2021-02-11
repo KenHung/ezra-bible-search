@@ -59,6 +59,12 @@ const Ezra = {
             }
             return text;
         },
+        lowRelevant(result) {
+            const values = Object.keys(result.kw_scores).map(function (kw) {
+                return result.kw_scores[kw]
+            });
+            return Math.max(values) < 0.5;
+        },
         clearSearch() {
             this.keyword = '';
             this.$refs.keyword.focus();

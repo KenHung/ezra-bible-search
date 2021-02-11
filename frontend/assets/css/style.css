@@ -31,6 +31,12 @@ em {
     text-decoration: underline;
 }
 
+.low-relevant {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-weight: 300;
+}
+
 .nav-scroller {
     font-size: .875rem;
     height: 2em;
