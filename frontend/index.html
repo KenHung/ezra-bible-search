@@ -7,11 +7,11 @@
 <main role="main" class="text-center mt-auto">
     <div style="font-size: 100px;">✝</div>
     <h1 class="cover-heading pb-4">Ezra 聖經語意搜尋</h1>
-    <form id="search-form" class="form mb-4">
+    <form id="search-form" class="form mb-4" novalidate>
         <div class="form-row">
             <div class="col">
-                <input class="form-control form-control-lg shadow-sm" name="q" ref="keyword" type="search"
-                    inputmode="search" aria-label="搜尋" required autofocus>
+                <input id="search-box" class="form-control form-control-lg shadow-sm" name="q" ref="keyword"
+                    type="search" inputmode="search" aria-label="搜尋" required autofocus>
             </div>
             <div class="col-auto">
                 <button class="btn btn-lg btn-outline-success shadow-sm" type="submit">
@@ -21,7 +21,7 @@
         </div>
     </form>
     <p class="lead d-none d-sm-block">
-        語意搜尋，查找關聯經文・<a href="#" data-toggle="modal" data-target="#aboutModal">關於 Ezra</a>
+        語意搜尋・查找關聯經文・<a href="#" data-toggle="modal" data-target="#aboutModal">關於 Ezra</a>
     </p>
 </main>
 {% endblock %}

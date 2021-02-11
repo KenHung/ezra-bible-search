@@ -51,7 +51,7 @@ const Ezra = {
             return bookName[ref.book] + ' ' + ref.chap + ':' + ref.vers;
         },
         highlight(result) {
-            text = result.text;
+            var text = result.text;
             for (const kw in result.kw_scores) {
                 if (result.kw_scores[kw] >= 0.5) {
                     text = text.replace(new RegExp(kw, 'g'), '<em>' + kw + '</em>');
