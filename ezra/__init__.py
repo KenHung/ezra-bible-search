@@ -25,10 +25,11 @@ def create_app():
 
     @app.route("/")
     def index():
-        data = {
-            "keyword": request.args.get("q"),
-        }
-        return render_template("index.html", data=data)
+        keyword = request.args.get("q", "")
+        if not keyword:
+            return render_template("index.html")
+        else:
+            return render_template("search.html", keyword=keyword)
 
     @app.route("/api")
     def search():

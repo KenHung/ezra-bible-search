@@ -1,0 +1,8 @@
+html, body {
+  height: 100%;
+  background-color: #f8f9fa;
+}
+
+.content {
+  padding: 1rem !important;
+}

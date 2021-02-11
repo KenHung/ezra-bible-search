@@ -25,7 +25,7 @@ const Ezra = {
             return this.allResults.slice(0, this.pages * PAGE_SIZE);
         },
         noMoreResults() {
-            return this.results.length >= MAX_SIZE;
+            return this.results.length >= this.allResults.length;
         }
     },
     methods: {

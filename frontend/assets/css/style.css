@@ -2,8 +2,13 @@
     display: none;
 }
 
-#ezra {
-    max-width: 600px;
+.content {
+    max-width: 650px;
+}
+
+.cover-heading {
+    font-size: 2rem;
+    font-weight: 300;
 }
 
 em {
@@ -12,17 +17,17 @@ em {
     font-style: normal;
 }
 
-a {
+.search-result a {
     color: #1a0dab;
     text-decoration: none;
     -webkit-tap-highlight-color: rgba(0, 0, 0, .10);
 }
 
-a:visited {
+.search-result a:visited {
     color: #609;
 }
 
-a:hover {
+.search-result a:hover {
     text-decoration: underline;
 }
 
@@ -58,7 +63,7 @@ a:hover {
 }
 
 footer {
-    font-size: .8rem;
+    font-size: .875rem;
 }
 
 footer p {
