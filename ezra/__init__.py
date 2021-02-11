@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from flask_cachebuster import CacheBuster
 
 from .lang import to_simplified  # noqa: F401
 from .resources import abbr
@@ -14,9 +13,6 @@ def create_app():
         static_url_path="/static",
         template_folder="../frontend",
     )
-    config = {"extensions": [".js", ".css"], "hash_size": 5}
-    cache_buster = CacheBuster(config=config)
-    cache_buster.init_app(app)
 
     from .conceptnet_strategy import ConceptNetStrategy
 
