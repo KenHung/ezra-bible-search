@@ -2,10 +2,6 @@
     display: none;
 }
 
-.content {
-    max-width: 650px;
-}
-
 .cover-heading {
     font-size: 2rem;
     font-weight: 300;

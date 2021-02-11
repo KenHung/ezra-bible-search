@@ -4,5 +4,5 @@ html, body {
 }
 
 .content {
-  padding: 1rem !important;
+  max-width: 650px;
 }

@@ -3,6 +3,7 @@
 {{ super() }}
 <link href="{{ url_for('static', filename='assets/css/cover.css', version=version) }}" rel="stylesheet">
 {% endblock %}
+{% block content_class %}{{ super() }} d-flex flex-column h-100 p-3 mx-auto{% endblock %}
 {% block content %}
 <main role="main" class="text-center mt-auto">
     <div style="font-size: 100px;">✝</div>
