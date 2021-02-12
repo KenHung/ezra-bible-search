@@ -45,17 +45,7 @@ class ConceptNetStrategy(BibleSearchStrategy):
     def search(
         self, keyword: str, top_k: int, in_range: np.ndarray = None
     ) -> List[Match]:
-        keyword_tk = np.array(list(word_tokenize(keyword)))
-        kw_vec = ccn_embeddings.get_word_vectors(keyword_tk)
-
-        def compute_similarity() -> np.ndarray:
-            reserved_tokens = np.zeros((keyword_tk.size, 1))
-            exact = pairwise_equal(keyword_tk, self._all_words)
-            cosine = pairwise_cosine_similarity(kw_vec, self._words_vec)
-            concat = np.where(exact, 1, cosine)
-            return np.hstack((reserved_tokens, concat))
-
-        similarity = compute_similarity()
+        similarity = self.compute_similarity(keyword)
 
         verses_in_range = (
             self._tokenized_verses[in_range]
@@ -64,7 +54,9 @@ class ConceptNetStrategy(BibleSearchStrategy):
         )
         # there are two parts of score: cosine similarity and count of good keywords
         all_match_scores = similarity[:, verses_in_range]
-        kw_verse_scores = np.amax(all_match_scores, axis=2)
+        match_kw_idx = all_match_scores.argmax(axis=2).T
+        match_tokens = np.take_along_axis(verses_in_range, match_kw_idx, axis=1).T
+        kw_verse_scores = np.take_along_axis(similarity, match_tokens, axis=1)
         verse_scores = np.core.records.fromarrays(
             [
                 kw_verse_scores.sum(axis=0),
@@ -72,21 +64,35 @@ class ConceptNetStrategy(BibleSearchStrategy):
             ],
             names="total,good_kw_counts",
         )
-        top_matches = np.argsort(verse_scores, order=["good_kw_counts", "total"])[
-            -1 : -top_k - 1 : -1
-        ]
+        verse_sorted_idx = np.flip(
+            np.argsort(verse_scores, order=["good_kw_counts", "total"])
+        )
+        top_matches = verse_sorted_idx[:top_k]
 
         def create_match(index: int) -> Match:
-            tokens = verses_in_range[index]
-            kw_scores = []
-            for kw in range(len(keyword_tk)):
-                scores = similarity[kw, tokens]
-                match_word = np.argmax(scores)
-                match_token = tokens[match_word]
-                kw_scores.append((self._detokenize(match_token), scores[match_word]))
-            return Match(in_range[index] if in_range is not None else index, kw_scores)
+            match_kw = map(self._detokenize, match_tokens.T[index])
+            kw_scores = list(zip(match_kw, kw_verse_scores.T[index]))
+            index_global = in_range[index] if in_range is not None else index
+            return Match(index_global, kw_scores)
 
         return [create_match(i) for i in top_matches]
+
+    def compute_similarity(self, keyword: str) -> np.ndarray:
+        keyword_tk = np.array(list(word_tokenize(keyword)))
+        kw_vec = ccn_embeddings.get_word_vectors(keyword_tk)
+
+        reserved_tokens = np.zeros((keyword_tk.size, 1))
+        exact = pairwise_equal(keyword_tk, self._all_words)
+        cosine = self._pairwise_cosine_similarity_words_vec(kw_vec)
+        concat = np.where(exact, 1, cosine)
+        return np.hstack((reserved_tokens, concat))
+
+    # to reduce load time of Sci-Kit Learn, cosine similarity was implemented
+    # the result should be the same as `sklearn.metrics.pairwise.cosine_similarity()`
+    def _pairwise_cosine_similarity_words_vec(self, kw_vec: np.ndarray) -> np.ndarray:
+        if not hasattr(self, "_words_vec_normalized"):
+            self._words_vec_normalized = normalize(self._words_vec).T
+        return normalize(kw_vec).dot(self._words_vec_normalized)
 
     # reserve token for padding
     _reserved_token_length = 1
@@ -102,12 +108,6 @@ class ConceptNetStrategy(BibleSearchStrategy):
 
 def pairwise_equal(xs: np.array, ys: np.array) -> np.ndarray:
     return np.stack([ys == x for x in xs])
-
-
-# to reduce load time of Sci-Kit Learn, cosine similarity calculation was implemented
-# the result should be the same as using `sklearn.metrics.pairwise.cosine_similarity()`
-def pairwise_cosine_similarity(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
-    return np.dot(normalize(X), normalize(Y).T)
 
 
 def normalize(X: np.ndarray) -> np.ndarray:
