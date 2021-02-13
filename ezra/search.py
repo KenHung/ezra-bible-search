@@ -41,6 +41,10 @@ class BibleSearchStrategy(ABC):
     def search(self, keyword: str, top_k: int, range: np.ndarray = None) -> List[Match]:
         return NotImplemented
 
+    @abstractmethod
+    def related_keywords(self, keyword: str, top_k: int) -> List[str]:
+        return NotImplemented
+
 
 class BibleSearchEngine:
     def __init__(self, strategy: BibleSearchStrategy):
@@ -94,3 +98,6 @@ class BibleSearchEngine:
                 print(f"Score: {match.score():.2f} {match.verse_hightlight()}")
             print()
         return results
+
+    def related_keywords(self, keyword: str, top_k: int = 5) -> List[str]:
+        return self.strategy.related_keywords(keyword, top_k)

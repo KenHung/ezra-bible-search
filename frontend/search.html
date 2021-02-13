@@ -49,16 +49,14 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 pl-lg-4 my-1 my-sm-2">
+        <div v-if="relatedKeywords.length > 0" class="col-lg-4 pl-lg-4 my-1 my-sm-2" v-cloak>
             <div class="card shadow-sm">
                 <div class="card-header">相關搜尋</div>
-                <div class="list-group list-group-flush">
-                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between">
-                        The current link item <i class="fas fa-search align-self-center"></i>
+                <div v-for="kw in relatedKeywords" class="list-group list-group-flush">
+                    <a :href="relatedSearch(kw)"
+                        class="list-group-item list-group-item-action d-flex justify-content-between">
+                        {{ kw }}<i class="fas fa-search align-self-center"></i>
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action">A second link item</a>
-                    <a href="#" class="list-group-item list-group-item-action">A third link item</a>
-                    <a href="#" class="list-group-item list-group-item-action">A fourth link item</a>
                 </div>
             </div>
         </div>
@@ -75,5 +73,6 @@
 <script>
     vm.keyword = '{{ keyword }}';
     vm.search(window.location.search);
+    vm.findRelated(window.location.search);
 </script>
 {% endblock %}

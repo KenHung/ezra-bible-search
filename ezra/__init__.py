@@ -34,7 +34,7 @@ def create_app():
         else:
             return render_template("search.html", version=version, keyword=keyword)
 
-    @app.route("/api")
+    @app.route("/api/search")
     def search():
         query = request.args.get("q")
         book = request.args.get("book", "").lower()
@@ -45,6 +45,11 @@ def create_app():
 
         results = ezra_engine.search(query, zh_cn=False, in_book=book, top_k=top_k)
         return {"status": "success", "data": [match.to_dict() for match in results]}
+
+    @app.route("/api/related-keywords")
+    def related_keywords():
+        keyword = request.args.get("q")
+        return {"status": "success", "data": ezra_engine.related_keywords(keyword)}
 
     def validate_search_args(q, book, top):
         invalid_args_msg = {}

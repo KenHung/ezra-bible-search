@@ -17,7 +17,8 @@ const Ezra = {
                 'history': '歷史書',
                 'poetry': '詩歌/智慧書',
                 'prophecy': '先知書'
-            }
+            },
+            relatedKeywords: []
         }
     },
     computed: {
@@ -41,7 +42,21 @@ const Ezra = {
                 }
                 vm.loading = false;
             };
-            xhr.open('GET', '/api' + query + '&top=' + MAX_SIZE);
+            xhr.open('GET', '/api/search' + query + '&top=' + MAX_SIZE);
+            xhr.send();
+        },
+        findRelated(query) {
+            const vm = this;
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function (e) {
+                if (xhr.status === 200) {
+                    var resp = JSON.parse(xhr.responseText)
+                    if (resp.status == 'success') {
+                        vm.relatedKeywords = resp.data;
+                    }
+                }
+            };
+            xhr.open('GET', '/api/related-keywords' + query);
             xhr.send();
         },
         wdLink(ref) {
@@ -85,6 +100,9 @@ const Ezra = {
             else {
                 return baseQuery + '&book=' + range;
             }
+        },
+        relatedSearch(keyword) {
+            return encodeURI(window.location.origin + window.location.pathname + '?q=' + keyword);
         }
     }
 };

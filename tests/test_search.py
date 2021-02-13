@@ -24,3 +24,9 @@ def test_search_exact(ezra_engine):
 def test_search_range(ezra_engine):
     result = ezra_engine.search("福音", zh_cn=False, in_book="letters", verbose=True)
     assert result[0].ref["book"] == "rom"
+
+
+def test_related_keywords(ezra_engine):
+    result = ezra_engine.related_keywords("喜樂 事奉")
+    assert result[0] != "喜樂 事奉"
+    assert "事奉" in result[0]

@@ -1,5 +1,6 @@
 import pickle
 from importlib import resources
+from itertools import groupby, product
 from typing import List
 
 import numpy as np
@@ -76,6 +77,23 @@ class ConceptNetStrategy(BibleSearchStrategy):
             return Match(index_global, kw_scores)
 
         return [create_match(i) for i in top_matches]
+
+    def related_keywords(self, keyword: str, top_k: int = 5) -> List[str]:
+        similarity = self.compute_similarity(keyword)
+        relevant_tk = np.argwhere(similarity >= 0.5)
+        tk_groups = []
+        for _, g in groupby(relevant_tk, lambda r: r[0]):
+            tk_groups.append(list(map(lambda r: r[1], g)))
+        tk_combinations = np.array(list(product(*tk_groups)))
+        if tk_combinations.size > 0:
+            tk_scores = np.take_along_axis(similarity, tk_combinations.T, axis=1)
+            total_scores = tk_scores.sum(axis=0)
+            tk_idx = np.flip(np.argsort(total_scores))
+            top_suggestions = tk_combinations[tk_idx]
+            suggestions = [" ".join(s) for s in map(self._detokenize, top_suggestions)]
+            return [s for s in suggestions if s != keyword][:top_k]
+        else:
+            return []
 
     def compute_similarity(self, keyword: str) -> np.ndarray:
         keyword_tk = np.array(list(word_tokenize(keyword)))
