@@ -1,6 +1,6 @@
 runtime: python38
-instance_class: F2
-entrypoint: gunicorn main:app --workers 1 -c /config/gunicorn.py
+instance_class: F4
+entrypoint: gunicorn main:app --workers 1 --threads 1 -c /config/gunicorn.py
 
 handlers:
 - url: /favicon.ico
