@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, render_template, request
+from flask import Flask, redirect, render_template, request
 
 from .lang import to_simplified  # noqa: F401
 from .resources import abbr
@@ -23,16 +23,17 @@ def create_app():
 
     @app.route("/")
     def index():
-        try:
-            with open("source-context.json") as f:
-                version = json.load(f)["git"]["revisionId"][:7]
-        except FileNotFoundError:
-            version = ""
+        return render_template("index.html", version=get_version())
+
+    @app.route("/search")
+    def search_page():
         keyword = request.args.get("q", "")
         if not keyword:
-            return render_template("index.html", version=version)
+            return redirect("/")
         else:
-            return render_template("search.html", version=version, keyword=keyword)
+            return render_template(
+                "search.html", version=get_version(), keyword=keyword
+            )
 
     @app.route("/api/search")
     def search():
@@ -50,6 +51,14 @@ def create_app():
     def related_keywords():
         keyword = request.args.get("q")
         return {"status": "success", "data": ezra_engine.related_keywords(keyword)}
+
+    def get_version():
+        try:
+            with open("source-context.json") as f:
+                version = json.load(f)["git"]["revisionId"][:7]
+        except FileNotFoundError:
+            version = ""
+        return version
 
     def validate_search_args(q, book, top):
         invalid_args_msg = {}
