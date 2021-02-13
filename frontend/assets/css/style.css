@@ -7,6 +7,12 @@
     font-weight: 300;
 }
 
+.search-heading {
+    font-weight: 300;
+    color: #343a40;
+    text-align: center;
+}
+
 em {
     color: #ea4335;
     font-weight: normal;

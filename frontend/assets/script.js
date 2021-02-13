@@ -103,6 +103,9 @@ const Ezra = {
         },
         relatedSearch(keyword) {
             return encodeURI(window.location.origin + window.location.pathname + '?q=' + keyword);
+        },
+        home() {
+            return window.location.origin;
         }
     }
 };
