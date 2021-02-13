@@ -74,7 +74,7 @@
 </div>
 {% endblock %}
 {% block script %}
-<script src="https://unpkg.com/vue@next"></script>
+<script src="https://unpkg.com/vue@3.0.5/dist/vue.global.prod.js"></script>
 <script src="{{ url_for('static', filename='assets/script.js', version=version) }}"></script>
 <script>
     vm.keyword = '{{ keyword }}';
