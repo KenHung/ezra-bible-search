@@ -1,11 +1,61 @@
-# Ezra 聖經語意搜尋
+# Ezra 聖經語意搜尋 - Semantic Search Engine for Chinese Bible
 
-應用語意模型的聖經經文搜尋器。
+應用語意搜尋技術的聖經經文搜尋器，通過新型的自然語言處理技術，了解字詞的意思來進行搜尋。即使經文內詞彙的字眼不一樣，只要意思相近，也有機會被搜尋出來。
 
-## 背景
+Semantic search engine for Chinese Bible, applying state-of-the-art natural
+language processing techniques, which is able to search for relevant biblical text
+by the meaning of search keywords.
 
-傳統的經文搜尋均需要搜尋關鍵字和經文完全一樣才能找到經文，所以，字詞相似的經文就被忽略。
-Ezra 就使用語意搜尋的技術，通過了解字詞的意思來進行搜尋，所以搜尋的結果會出現近義詞。
+## 安裝
+
+系統需求：
+
+* [Python 3.8](https://www.python.org/downloads/) 或以上（較低版本或許也可以，但沒有詳細測試）
+
+安裝步驟：
+
+1. 安裝所需要的 Python packages
+
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+2. 下載所需的原始數據，放到 `/data` 中。
+   * [信望愛和合本](https://bible.fhl.net/public/dnstrunv.tgz)
+   * [ConceptNet Numberbatch 詞向量](http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/19.08/mini.h5)
+
+   也可以使用 `make` 下載所需檔案，如果沒有 `make`，就需要手動下載到 `/data` 中。
+
+   ```sh
+   make data
+   ```
+
+3. 預備運行需用的數據檔案，`db.h5` 內含是經文和詞向量數據。  
+   `conceptnet_strategy.pickle` 是一些預先計算的數據，作用是減低程序初始化時間。  
+   製作數據檔案時需要 `pandas` 但運行程序時就不需要。
+
+   ```sh
+   pip install pandas
+   ```
+
+   可以用 `make` 製作數據檔。沒有 `make` 的話，可以手動執行 `Makefile` 內相關的指令。
+
+   ```sh
+   make ezra/resources/db.h5
+   make ezra/resources/conceptnet_strategy.pickle
+   ```
+
+## 用法
+
+一般開發可以使用 `flask`：
+```
+FLASK_APP=ezra FLASK_ENV=development flask run --without-threads
+```
+
+伺服器上使用可以使用 `gunicorn`，目前不支援多 multiprocessing/multithreading：
+```
+gunicorn main:app --workers 1 --threads 1
+```
 
 ## 數據來源
 
