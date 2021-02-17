@@ -52,7 +52,7 @@ by the meaning of search keywords.
 FLASK_APP=ezra FLASK_ENV=development flask run --without-threads
 ```
 
-伺服器上使用可以使用 `gunicorn`，目前不支援多 multiprocessing/multithreading：
+伺服器上使用可以使用 `gunicorn`，目前不支援 multiprocessing/multithreading：
 ```
 gunicorn main:app --workers 1 --threads 1
 ```
