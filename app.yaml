@@ -11,5 +11,9 @@ handlers:
   static_files: frontend/robot.txt
   upload: frontend/robot.txt
 
+- url: /google61ad13e8b605dad5.html
+  static_files: frontend/google61ad13e8b605dad5.html
+  upload: frontend/google61ad13e8b605dad5.html
+
 - url: /static/assets
   static_dir: frontend/assets
