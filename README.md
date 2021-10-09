@@ -41,8 +41,7 @@ by the meaning of search keywords.
    可以用 `make` 製作數據檔。沒有 `make` 的話，可以手動執行 `Makefile` 內相關的指令。
 
    ```sh
-   make ezra/resources/db.h5
-   make ezra/resources/conceptnet_strategy.pickle
+   make ezra/resources
    ```
 
 ## 用法
