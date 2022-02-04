@@ -12,6 +12,14 @@ from .word_tokenizer import word_tokenize
 
 class ConceptNetStrategy(BibleSearchStrategy):
     def __init__(self):
+        """
+        Initialize search required data, it can be saved and re-loaded to skip
+        initialization every time. It has 3 steps:
+        1. Word tokenize the whole Bible (turn sentences into word pieces)
+        2. Get word vectors of words exist in the Bible
+        3. Tokenize each word in the Bible (use a unique number to repsent each word)
+           for performance reason
+        """
         from .resources import bible
 
         print("Word tokenizing verses...")
