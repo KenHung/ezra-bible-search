@@ -6,6 +6,26 @@ Semantic search engine for Chinese Bible, applying state-of-the-art natural
 language processing techniques, which is able to search for relevant biblical text
 by the meaning of search keywords.
 
+## Setup
+
+```
+pip install ezra-bible-search
+```
+
+Usage
+```
+from ezra import BibleSearchEngine
+
+ezra_engine = BibleSearchEngine()
+ezra_engine.search(...)
+```
+
+Serve as backend?
+Flask module?
+```
+flask run ezra
+```
+
 ## 安裝
 
 系統需求：

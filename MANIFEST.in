@@ -1,0 +1,1 @@
+include ezra/resources/conceptnet_strategy.pickle ezra/resources/db.h5
