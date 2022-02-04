@@ -75,7 +75,7 @@
 {% endblock %}
 {% block script %}
 <script src="https://unpkg.com/vue@3.0.5/dist/vue.global.prod.js"></script>
-<script src="{{ url_for('static', filename='assets/script.js', version=version) }}"></script>
+<script src="{{ url_for('static', filename='script.js', version=version) }}"></script>
 <script>
     vm.keyword = '{{ keyword }}';
     vm.search(window.location.search);

@@ -9,12 +9,7 @@ from .word_tokenizer import word_tokenize  # noqa: F401
 
 
 def create_app():
-    app = Flask(
-        __name__,
-        static_folder="../frontend",
-        static_url_path="/static",
-        template_folder="../frontend",
-    )
+    app = Flask(__name__)
 
     from .conceptnet_strategy import ConceptNetStrategy
 

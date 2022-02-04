@@ -4,16 +4,16 @@ entrypoint: gunicorn main:app --workers 1 --threads 1 -c /config/gunicorn.py
 
 handlers:
 - url: /favicon.ico
-  static_files: frontend/favicon.svg
-  upload: frontend/favicon.svg
+  static_files: ezra/static/favicon.svg
+  upload: ezra/static/favicon.svg
 
 - url: /robot.txt
-  static_files: frontend/robot.txt
-  upload: frontend/robot.txt
+  static_files: ezra/static/robot.txt
+  upload: ezra/static/robot.txt
 
 - url: /google61ad13e8b605dad5.html
-  static_files: frontend/google61ad13e8b605dad5.html
-  upload: frontend/google61ad13e8b605dad5.html
+  static_files: ezra/static/google61ad13e8b605dad5.html
+  upload: ezra/static/google61ad13e8b605dad5.html
 
-- url: /static/assets
-  static_dir: frontend/assets
+- url: /static
+  static_dir: ezra/static
