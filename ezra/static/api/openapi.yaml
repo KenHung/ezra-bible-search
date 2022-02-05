@@ -1,0 +1,208 @@
+openapi: "3.0.3"
+info:
+  title: Ezra Bible Search
+  version: "0.9"
+servers:
+  - url: https://ezra-bible-search.df.r.appspot.com/api
+  - url: http://localhost:5000/api
+paths:
+  /search:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/query"
+        - name: book
+          description: search range in Bible books
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/book"
+        - name: top
+          description: top results to be displayed
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        score:
+                          description: relatedless score
+                          type: integer
+                        kw_score:
+                          description: relatedless score of each keyword
+                          type: object
+                        ref:
+                          description: Bible reference
+                          type: object
+                          properties:
+                            book:
+                              $ref: "#/components/schemas/book"
+                            chap:
+                              type: integer
+                              minimum: 1
+                            vers:
+                              type: integer
+                              minimum: 1
+                        text:
+                          description: Bible text
+                          type: string
+                      example:
+                        {
+                          "score": 1.7845185866114202,
+                          "kw_scores":
+                            { "事奉": 1, "喜悅": 0.7845185866114202 },
+                          "ref": { "book": "rom", "chap": 12, "vers": 1 },
+                          "text": "所以，弟兄們，我以神的慈悲勸你們，將身體獻上，當作活祭，是聖潔的，是神所喜悅的；你們如此事奉乃是理所當然的。",
+                        }
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [fail]
+                  data:
+                    type: object
+                    properties:
+                      q:
+                        type: string
+                        example: Missing argument
+                      book:
+                        type: string
+                        example: "Must be one of the following: [nt, ot, ...]"
+                      top:
+                        type: string
+                        example: "Must be within 1 and 100"
+  /related-keywords:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/query"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      [
+                        "歡樂 事奉",
+                        "喜樂 服事",
+                        "喜樂 效勞",
+                        "喜悅 事奉",
+                        "喜樂 伺候",
+                      ]
+components:
+  parameters:
+    query:
+      name: q
+      description: search keywords
+      in: query
+      schema:
+        type: string
+      required: true
+      example: 喜樂 事奉
+  schemas:
+    book:
+      type: string
+      enum:
+        - nt
+        - ot
+        - gospels
+        - letters
+        - torah
+        - history
+        - poetry
+        - prophecy
+        - gen
+        - ex
+        - lev
+        - num
+        - deut
+        - josh
+        - judg
+        - ruth
+        - 1sam
+        - 2sam
+        - 1kin
+        - 2kin
+        - 1chr
+        - 2chr
+        - ezra
+        - neh
+        - esth
+        - job
+        - ps
+        - prov
+        - eccl
+        - song
+        - is
+        - jer
+        - lam
+        - ezek
+        - dan
+        - hos
+        - joel
+        - amos
+        - obad
+        - jon
+        - mic
+        - nah
+        - hab
+        - zeph
+        - hag
+        - zech
+        - mal
+        - matt
+        - mark
+        - luke
+        - john
+        - acts
+        - rom
+        - 1cor
+        - 2cor
+        - gal
+        - eph
+        - phil
+        - col
+        - 1thess
+        - 2thess
+        - 1tim
+        - 2tim
+        - titus
+        - philem
+        - heb
+        - james
+        - 1pet
+        - 2pet
+        - 1john
+        - 2john
+        - 3john
+        - jude
+        - rev

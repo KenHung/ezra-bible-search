@@ -17,3 +17,11 @@ handlers:
 
 - url: /static
   static_dir: ezra/static
+
+- url: /api/(.*\.(html|yaml|js|css|png))$
+  static_files: ezra/static/api/\1
+  upload: ezra/static/api/.*
+
+- url: /api$
+  static_files: ezra/static/api/redirect.html
+  upload: ezra/static/api/redirect.html

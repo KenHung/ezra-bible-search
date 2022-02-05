@@ -30,6 +30,10 @@ def create_app():
                 "search.html", version=get_version(), keyword=keyword
             )
 
+    @app.route("/api")
+    def api():
+        return redirect("/static/api/index.html")
+
     @app.route("/api/search")
     def search():
         query = request.args.get("q")
