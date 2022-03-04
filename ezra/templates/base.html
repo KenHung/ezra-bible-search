@@ -16,8 +16,8 @@
     <!-- Favicons -->
     <link rel="icon" href="/favicon.ico">
 
-    <link href="/static/assets/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='assets/css/style.css', version=version) }}" rel="stylesheet">
+    <link href="/static/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css', version=version) }}" rel="stylesheet">
 
     <title>{% block title %}Ezra 聖經語意搜尋{% endblock %}</title>
     {% endblock %}
@@ -49,7 +49,13 @@
                         </div>
                         <div class="modal-body">
                             <p>Ezra 聖經語意搜尋，應用語意模型的聖經經文搜尋器。</p>
+                            <p>本程式的API也是開放的，<a href="/api">參考文檔</a>。</p>
+                            <p>
+                                如有任何問題，可以通過這個電郵聯絡：<a href="mailto:eiekenhung@gmail.com"
+                                    target="_blank">eiekenhung@gmail.com</a>
+                            </p>
                             <p>版權所有 © 2021 Ken Hung</p>
+                            <hr>
                             <p>本程式是自由軟件，你可以根據 <a href="https://www.gnu.org/licenses/agpl-3.0.html"
                                     target="_blank">AGPL</a>
                                 條款（自由軟體基金會公佈的第三版或是你選擇的後續版本）修改和再發佈它，源代碼位置：
@@ -63,10 +69,6 @@
                                     Numberbatch</a> 則由 <a href="https://www.luminoso.com/" target="_blank">Luminoso</a>
                                 以 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-By-SA
                                     4.0</a> 條款授權使用。
-                            </p>
-                            <p>
-                                如有任何問題，可以通過這個電郵聯絡：<a href="mailto:eiekenhung@gmail.com"
-                                    target="_blank">eiekenhung@gmail.com</a>
                             </p>
                             <hr>
                             <p class="mb-0">本程式旨在幫助人查找經文，但是並不包含任何擔保，搜尋結果可能不準確，歡迎來信指正，惟願上帝賜福予使用者。具體免責聲明請檢視 AGPL 條款。</p>
