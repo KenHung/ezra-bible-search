@@ -29,8 +29,9 @@ ezra/resources/conceptnet_strategy.pickle:
 test:
 	pytest tests
 
-build:
+publish:
 	python -m build
+	twine upload --repository testpypi dist/*
 
 deploy: test
 	gcloud app deploy
