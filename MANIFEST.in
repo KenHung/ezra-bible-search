@@ -1,0 +1,3 @@
+include ezra/resources/conceptnet_strategy.pickle ezra/resources/db.h5 ezra/word_tokenizer/*.txt
+graft ezra/static
+graft ezra/templates
