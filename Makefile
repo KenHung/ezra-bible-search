@@ -30,6 +30,7 @@ test:
 	pytest tests
 
 publish:
+	rm -r dist
 	python -m build
 	twine upload --repository testpypi dist/*
 
