@@ -7,7 +7,7 @@ language processing techniques, which is able to search for relevant biblical te
 by the meaning of search keywords.
 
 搜尋「喜樂 事奉」的結果：
-![Search example](example.png)
+![Search example](https://raw.githubusercontent.com/KenHung/ezra-bible-search/master/example.png)
 
 ## 安裝
 
@@ -35,7 +35,7 @@ pip install ezra-search
 
 ### Web App
 自帶簡單的 Web 介面：
-![UI](ui.png)
+![UI](https://raw.githubusercontent.com/KenHung/ezra-bible-search/master/ui.png)
 
 安裝後可以 `flask` 或 `gunicorn` 直接起動，但目前不支援 multiprocessing/multithreading
 * `flask`
