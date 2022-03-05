@@ -6,74 +6,45 @@ Semantic search engine for Chinese Bible, applying state-of-the-art natural
 language processing techniques, which is able to search for relevant biblical text
 by the meaning of search keywords.
 
-## Setup
-
-```
-pip install ezra-bible-search
-```
-
-Usage
-```
-from ezra import BibleSearchEngine
-
-ezra_engine = BibleSearchEngine()
-ezra_engine.search(...)
-```
-
-Serve as backend?
-Flask module?
-```
-flask run ezra
-```
+搜尋「喜樂 事奉」的結果：
+![Search example](example.png)
 
 ## 安裝
 
-系統需求：
-
-* [Python 3.8](https://www.python.org/downloads/) 或以上（較低版本或許也可以，但沒有詳細測試）
-
-安裝步驟：
-
-1. 安裝所需要的 Python packages
-
-   ```sh
-   pip install -r requirements.txt
-   ```
-
-2. 下載所需的原始數據，放到 `/data` 中。
-   * [信望愛和合本](https://bible.fhl.net/public/dnstrunv.tgz)
-   * [ConceptNet Numberbatch 詞向量](http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/19.08/mini.h5)
-
-   也可以使用 `make` 下載所需檔案，如果沒有 `make`，就需要手動下載到 `/data` 中。
-
-   ```sh
-   make data
-   ```
-
-3. 預備運行需用的數據檔案，`db.h5` 內含是經文和詞向量數據。  
-   `conceptnet_strategy.pickle` 是一些預先計算的數據，作用是減低程序初始化時間。  
-   製作數據檔案時需要 `pandas` 但運行程序時就不需要。
-
-   ```sh
-   pip install pandas
-   ```
-
-   可以用 `make` 製作數據檔。沒有 `make` 的話，可以手動執行 `Makefile` 內相關的指令。
-
-   ```sh
-   make ezra/resources
-   ```
+* 系統需求：[Python 3.8](https://www.python.org/downloads/) 或以上（較低版本或許也可以，但沒有詳細測試）
+* 使用 `pip` 安裝：
+```
+pip install ezra-search
+```
+* 手動安裝：[詳細步驟](https://github.com/KenHung/ezra-bible-search/wiki/%E6%89%8B%E5%8B%95%E5%AE%89%E8%A3%9D%E6%AD%A5%E9%A9%9F)
 
 ## 用法
 
-一般開發可以使用 `flask`：
+### Python module
 ```
-FLASK_APP=ezra FLASK_ENV=development flask run --without-threads
+>>> import ezra
+>>> results = ezra.search("喜樂 事奉", top_k=3)
+....
+>>> for r in results:
+...     print(r.to_dict())
+... 
+{'text': '所以，弟兄們，我以神的慈悲勸你們，將身體獻上，當作活祭，是聖潔的，是神所喜悅的；你們如此事奉乃是理所當然的。', 'ref': {'book': 'rom', 'chap': 12, 'vers': 1}, 'score': 1.7845185866114202, 'kw_scores': {'喜悅': 0.78451858661142, '事奉': 1.0}}
+{'text': '「因為你富有的時候，不歡心樂意地事奉耶和華─你的神，', 'ref': {'book': 'deut', 'chap': 28, 'vers': 47}, 'score': 1.609989717447291, 'kw_scores': {'歡心': 0.609989717447291, '事奉': 1.0}}
+{'text': '希該喜悅以斯帖，就恩待她，急忙給她需用的香品和她所當得的分，又派所當得的七個宮女服事她，使她和她的宮女搬入女院上好的房屋。', 'ref': {'book': 'esth', 'chap': 2, 'vers': 9}, 'score': 1.580993769747976, 'kw_scores': {'喜悅': 0.78451858661142, '服事': 0.7964751831365557}}
 ```
 
-伺服器上使用可以使用 `gunicorn`，目前不支援 multiprocessing/multithreading：
+### Web App
+自帶簡單的 Web 介面：
+![UI](ui.png)
+
+安裝後可以 `flask` 或 `gunicorn` 直接起動，但目前不支援 multiprocessing/multithreading
+* `flask`
 ```
-gunicorn main:app --workers 1 --threads 1
+FLASK_APP=ezra flask run --without-threads
+```
+* `gunicorn`（需另行安裝）
+```
+gunicorn --workers=1 --threads=1 'ezra:create_app()'
 ```
 
 ## 數據來源

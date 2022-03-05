@@ -53,7 +53,7 @@ class BibleSearchEngine:
     def search(
         self,
         keyword: str,
-        zh_cn: bool,
+        zh_cn: bool = False,
         in_book: str = None,
         top_k: int = 10,
         verbose: bool = False,
